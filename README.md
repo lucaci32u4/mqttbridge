@@ -1,5 +1,7 @@
 # MqttBridge
 ![build](https://github.com/lucaci32u4/mqttbridge/actions/workflows/maven.yml/badge.svg)
+
+
 MqttBridge is an application for connecting various smart devices to MQTT. It offers support base for exposing device's data to mqtt and syncing logic. 
 
 The application is compatible with Home Assistant dsicovery protocol over MQTT.
