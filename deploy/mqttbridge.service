@@ -1,0 +1,9 @@
+[Unit]
+Description=MarantzBridge Daemon
+After=network-online.target
+
+[Service]
+ExecStart=java -jar /home/{{uz}}/.local/share/mqttbridge/{{jar}} --config /home/{{uz}}/.config/mqttbridge/config.json
+
+[Install]
+WantedBy=multi-user.target

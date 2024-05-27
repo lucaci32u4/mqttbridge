@@ -1,0 +1,63 @@
+---
+- name: Build JAR
+  hosts: all
+  become: false
+  tasks:
+
+    - name: "Find remote username"
+      set_fact:
+        uz: "{{ ansible_user_id }}"
+
+    - name: Maven package
+      local_action:
+        module: command
+        cmd: mvn -f ../ clean package
+
+    - name: Find jar
+      local_action:
+        module: shell
+        cmd: /usr/bin/ls ../target | grep -E 'mqttbridge-[-.0-9a-zA-Z]+.jar' | grep -vE 'sources|original|javadoc'
+      register: findjar
+
+    - name: Set jar fact
+      set_fact:
+        jar: "{{ findjar.stdout }}"
+
+
+    - name: Copy jar
+      copy:
+        src: "../target/{{jar}}"
+        dest: "/home/{{uz}}/.local/share/mqttbridge/"
+        remote_src: false
+
+    - name: Copy jar
+      copy:
+        src: "config.json"
+        dest: "/home/{{uz}}/.config/mqttbridge/"
+        remote_src: false
+
+    - name: Copy systemd service
+      template:
+        src: "mqttbridge.service"
+        dest: "/home/{{uz}}/.config/systemd/user/"
+
+    - name: Stop existing mqttbridge
+      systemd_service:
+        scope: user
+        name: mqttbridge.service
+        state: stopped
+      ignore_errors: True
+
+    - name: Reload systemd daemon
+      systemd_service:
+        scope: user
+        daemon_reload: true
+
+    - name: Start mqttbridge
+      systemd_service:
+        scope: user
+        name: mqttbridge.service
+        state: started
+        enabled: true
+
+

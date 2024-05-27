@@ -1,0 +1,19 @@
+{
+  "mqtt": {
+    "username": "admin",
+    "password": "admin",
+    "port": 7883,
+    "qos": 2,
+    "host": "hass.lr",
+    "publisherId": "MArantzzazaza",
+    "baseTopic": "marantz2mqtt/livingroom"
+  },
+  "discovery": {
+    "entityName": "Speakers",
+    "discoveryBaseTopic": "homeassistant"
+  },
+  "device": {
+    "host": "10.2.2.13"
+  },
+  "deviceCodename": "SR6010"
+}
