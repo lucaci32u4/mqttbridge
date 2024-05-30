@@ -11,6 +11,7 @@ import net.lucaciresearch.mqttbridge.util.BetterReentrantLock;
 import net.lucaciresearch.mqttbridge.util.PollSpeed;
 import net.lucaciresearch.mqttbridge.util.TruthSource;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
@@ -24,16 +25,7 @@ public abstract class VariableNode<Ty, DTy> {
     private Ty value;
 
     @Getter
-    private InfoState infoState = InfoState.UNINITIALIZED;
-
-    @Getter
-    private Availability availability = Availability.UNAVAILABLE;
-
-    @Getter
-    private PublishSubject<InfoState> infoStateStream = PublishSubject.create();
-
-    @Getter
-    private PublishSubject<Availability> availabilityStream = PublishSubject.create();
+    private List<CDCTransaction<Ty>> transactions;
 
     public VariableNode(PollSpeed pollSpeed, DeviceAdapter<Ty, DTy> deviceAdapter, String deviceKey, MqttAdapter<Ty> mqttAdapter, String mqttSubtopic) {
         this.pollSpeed = pollSpeed;
