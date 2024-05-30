@@ -265,17 +265,26 @@ public class BridgeManager<DTy> {
         // if variable is unavailable or unitialized, publish empty string
         String message = variable.infoState() == InfoState.UNINITIALIZED ? "" : variable.toMqtt();
         log.info("Publishing variable {} message {}", variable.deviceKey(), message);
-        Single<Mqtt5PublishResult> fut = mqttInterface.publishTopic(mqttInterface.getConfig().baseTopic() + "/" + variable.mqttSubtopic(), message, true);
-        try {
-            fut.timeout(6, TimeUnit.SECONDS).blockingGet();
-        } catch (AsyncRuntimeException | ConnectionFailedException e) {
-            log.warn("Publish variable {} failed: {}", variable.deviceKey(), e.getMessage());
-            throw e;
-        } catch (RuntimeException te) {
-            if (te.getCause() != null && te.getCause() instanceof TimeoutException) {
-                log.error("MQTT client got stuck publishing AGAIN. PLEASE INVESTIGATE");
+        RuntimeException exception = null;
+        for (int i = 0; i < 3; i++) {
+            Single<Mqtt5PublishResult> fut = mqttInterface.publishTopic(mqttInterface.getConfig().baseTopic() + "/" + variable.mqttSubtopic(), message, true);
+            try {
+                long nano = System.nanoTime();
+                fut.timeout(6, TimeUnit.SECONDS).blockingGet();
+                exception = null;
+                break;
+            } catch (AsyncRuntimeException | ConnectionFailedException e) {
+                log.warn("Publish variable {} failed: {}", variable.deviceKey(), e.getMessage());
+                exception = e;
+            } catch (RuntimeException te) {
+                if (te.getCause() != null && te.getCause() instanceof TimeoutException) {
+                    log.error("MQTT client got stuck publishing AGAIN. PLEASE INVESTIGATE");
+                }
             }
         }
+        if (exception != null)
+            throw exception;
+
 
     }
 
@@ -345,28 +354,31 @@ public class BridgeManager<DTy> {
         try {
             Flowable<TopicMessage> t = mqttInterface.subscribeTopic(mqttInterface.getConfig().baseTopic() + "/#");
             t.subscribe(tm -> {
-                log.debug("Received MQTT message on topic {}", tm.topic());
-                if (!tm.topic().startsWith(mqttInterface.getConfig().baseTopic()))
-                    return;
-                if (tm.topic().length() <= mqttInterface.getConfig().baseTopic().length())
-                    return;
+                CompletableFuture.runAsync(() -> {
+                    log.debug("Received MQTT message on topic {}", tm.topic());
+                    if (!tm.topic().startsWith(mqttInterface.getConfig().baseTopic()))
+                        return;
+                    if (tm.topic().length() <= mqttInterface.getConfig().baseTopic().length())
+                        return;
 
-                String subtopic = tm.topic().substring(mqttInterface.getConfig().baseTopic().length() + 1);
-                VariableNode<?, DTy> node = dci.getNodes().stream().filter(v -> v.mqttSubtopic().equals(subtopic)).findAny().orElse(null);
-                if (node == null) {
-                    log.warn("Received rogue mqtt message on topic {}", tm.topic());
-                    return;
-                }
-                lockVariable(node);
-                if (node.availability().bool()) {
-                    boolean okay = node.parseMqtt(tm.message());
-                    if (!okay) {
-                        node.infoState(InfoState.DIRTY_MQTT); // This will cause a message to be sent back
+                    String subtopic = tm.topic().substring(mqttInterface.getConfig().baseTopic().length() + 1);
+                    VariableNode<?, DTy> node = dci.getNodes().stream().filter(v -> v.mqttSubtopic().equals(subtopic)).findAny().orElse(null);
+                    if (node == null) {
+                        log.warn("Received rogue mqtt message on topic {}", tm.topic());
+                        return;
                     }
-                } else {
-                    log.warn("Received mqtt command message for variable {} that is unavailable", node.deviceKey());
-                }
-                node.lock().unlock();
+                    lockVariable(node);
+                    if (node.availability().bool()) {
+                        boolean okay = node.parseMqtt(tm.message());
+                        if (!okay) {
+                            node.infoState(InfoState.DIRTY_MQTT); // This will cause a message to be sent back
+                        }
+                    } else {
+                        log.warn("Received mqtt command message for variable {} that is unavailable", node.deviceKey());
+                    }
+                    node.lock().unlock();
+                }, pollingExecutor);
+
             }, throwable -> {
                 log.error("Subscribe to topic failed because: ", throwable);
             });
@@ -430,7 +442,7 @@ public class BridgeManager<DTy> {
     private static void lockVariable(VariableNode<?, ?> variable) {
         while (true) {
             try {
-                boolean lock = variable.lock().tryLock(10, TimeUnit.SECONDS);
+                boolean lock = variable.lock().tryLock(50, TimeUnit.SECONDS);
                 if (lock)
                     break;
                 log.error("DEV ERROR: Locking variable {} takes too long", variable.deviceKey());

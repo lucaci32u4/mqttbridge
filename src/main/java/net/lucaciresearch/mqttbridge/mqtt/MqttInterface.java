@@ -1,5 +1,6 @@
 package net.lucaciresearch.mqttbridge.mqtt;
 
+import com.hivemq.client.internal.logging.InternalLoggerFactory;
 import com.hivemq.client.internal.mqtt.message.auth.MqttSimpleAuth;
 import com.hivemq.client.internal.mqtt.message.auth.MqttSimpleAuthBuilder;
 import com.hivemq.client.internal.util.AsyncRuntimeException;
@@ -132,6 +133,7 @@ public class MqttInterface {
                 .qos(MqttQos.EXACTLY_ONCE)
                 .payload(message.getBytes())
                 .retain(retained)
+                .correlationData("mqttbridge".getBytes(StandardCharsets.UTF_8))
                 .build()
         ).toFlowable()).doOnNext((pr) -> {
             if (pr.getError().isPresent()) {
@@ -161,7 +163,9 @@ public class MqttInterface {
             log.debug("Success subscribing to MQTT topic {}", topic);
         });
 
-        return res.map(mqtt5Publish -> {
+        return res
+                .filter(mqtt5Publish -> mqtt5Publish.getCorrelationData().map(bb -> StandardCharsets.UTF_8.decode(bb).toString()).filter("mqttbridge"::equals).isEmpty())
+                .map(mqtt5Publish -> {
             return new TopicMessage(
                     StandardCharsets.UTF_8.decode(mqtt5Publish.getTopic().toByteBuffer()).toString(),
                     mqtt5Publish.getPayload().map(bb -> StandardCharsets.UTF_8.decode(bb).toString()).orElse("")
