@@ -267,10 +267,14 @@ public class BridgeManager<DTy> {
         log.info("Publishing variable {} message {}", variable.deviceKey(), message);
         Single<Mqtt5PublishResult> fut = mqttInterface.publishTopic(mqttInterface.getConfig().baseTopic() + "/" + variable.mqttSubtopic(), message, true);
         try {
-            fut.blockingGet();
+            fut.timeout(6, TimeUnit.SECONDS).blockingGet();
         } catch (AsyncRuntimeException | ConnectionFailedException e) {
             log.warn("Publish variable {} failed: {}", variable.deviceKey(), e.getMessage());
             throw e;
+        } catch (RuntimeException te) {
+            if (te.getCause() != null && te.getCause() instanceof TimeoutException) {
+                log.error("MQTT client got stuck publishing AGAIN. PLEASE INVESTIGATE");
+            }
         }
 
     }
