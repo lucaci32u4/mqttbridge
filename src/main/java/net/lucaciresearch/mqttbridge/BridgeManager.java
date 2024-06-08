@@ -111,14 +111,27 @@ public class BridgeManager<DTy> {
             }
 
             CompletableFuture.runAsync(() -> {
-                lockVariable(variable);
+                try {
+                    lockVariable(variable);
 
-                if (variable.availability() == Availability.UNAVAILABLE) {
-                    if (!isDoingDiscovery)
-                        log.error("DEV ERROR: Device sent update for variable {} that is unavailable", dTyKeyValue.key());
+                    if (variable.availability() == Availability.UNAVAILABLE) {
+                        if (!isDoingDiscovery)
+                            log.error("DEV ERROR: Device sent update for variable {} that is unavailable", dTyKeyValue.key());
+                        variable.lock().unlock();
+                        return;
+                    }
+
+                    variable.parseDevice(dTyKeyValue.value());
+                } catch (VariableUnavailableException ve) {
+                    log.error("Device sent update for variable {} that is unavailable", dTyKeyValue.key());
+                }catch (Exception e) {
+                    // should not throw any exception here!!!
+                    e.printStackTrace();
+                } finally {
                     variable.lock().unlock();
-                    return;
                 }
+
+
 
                 try {
                     variable.parseDevice(dTyKeyValue.value());
@@ -126,7 +139,7 @@ public class BridgeManager<DTy> {
                     log.error("Device sent update for variable {} that is unavailable", dTyKeyValue.key());
                 }
 
-                variable.lock().unlock();
+
             }, pollingExecutor);
 
         });
@@ -367,16 +380,22 @@ public class BridgeManager<DTy> {
                         log.warn("Received rogue mqtt message on topic {}", tm.topic());
                         return;
                     }
-                    lockVariable(node);
-                    if (node.availability().bool()) {
-                        boolean okay = node.parseMqtt(tm.message());
-                        if (!okay) {
-                            node.infoState(InfoState.DIRTY_MQTT); // This will cause a message to be sent back
+                    try {
+                        lockVariable(node);
+                        if (node.availability().bool()) {
+                            boolean okay = node.parseMqtt(tm.message());
+                            if (!okay) {
+                                node.infoState(InfoState.DIRTY_MQTT); // This will cause a message to be sent back
+                            }
+                        } else {
+                            log.warn("Received mqtt command message for variable {} that is unavailable", node.deviceKey());
                         }
-                    } else {
-                        log.warn("Received mqtt command message for variable {} that is unavailable", node.deviceKey());
+                    } catch (Exception e) {
+                        // no exception should be thrown here
+                        e.printStackTrace();
+                    } finally {
+                        node.lock().unlock();
                     }
-                    node.lock().unlock();
                 }, pollingExecutor);
 
             }, throwable -> {
