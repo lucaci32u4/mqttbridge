@@ -6,4 +6,4 @@ After=network-online.target
 ExecStart=java -jar /home/{{uz}}/.local/share/mqttbridge/{{jar}} --config /home/{{uz}}/.config/mqttbridge/config.json
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
