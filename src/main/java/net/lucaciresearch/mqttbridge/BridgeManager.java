@@ -126,7 +126,7 @@ public class BridgeManager<DTy> {
                     log.error("Device sent update for variable {} that is unavailable", dTyKeyValue.key());
                 }catch (Exception e) {
                     // should not throw any exception here!!!
-                    e.printStackTrace();
+                    log.error("Parsing device ");
                 } finally {
                     variable.lock().unlock();
                 }
@@ -222,8 +222,8 @@ public class BridgeManager<DTy> {
             }
         }
         List<String> unavailable = dci.getNodes().stream().filter(n -> n.availability() == Availability.UNAVAILABLE).map(VariableNode::deviceKey).toList();
-        log.info("Finished complete poll with {} available variables out of total {}", dci.getNodes().size() - unavailable.size(), dci.getNodes().size());
         log.info("Unavailable variables are: {}", String.join(" ", unavailable));
+        log.info("Finished complete poll with {} available variables out of total {}", dci.getNodes().size() - unavailable.size(), dci.getNodes().size());
         isDoingDiscovery = false;
     }
 

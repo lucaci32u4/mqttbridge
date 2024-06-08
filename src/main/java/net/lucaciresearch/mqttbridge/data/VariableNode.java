@@ -98,7 +98,12 @@ public abstract class VariableNode<Ty, DTy> {
     }
 
     public void parseDevice(DTy deviceValue) throws VariableUnavailableException {
-        setValue(deviceAdapter.parseDevice(deviceValue), TruthSource.DEVICE);
+        try {
+            Ty value = deviceAdapter.parseDevice(deviceValue);
+            setValue(value, TruthSource.DEVICE);
+        } catch (Exception any) {
+            log.error("Parsing device value {} for variable {} failed", deviceValue, deviceKey, any);
+        }
     }
 
 
@@ -116,6 +121,9 @@ public abstract class VariableNode<Ty, DTy> {
             return true;
         } catch (InvalidMqttInput e) {
             log.warn("Got invalid value from MQTT for variable {}: {}", deviceKey, e.getMessage());
+            return false;
+        } catch (Exception any) {
+            log.error("Parsing MQTT value {} for variable {} failed", mqttValue, deviceKey, any);
             return false;
         }
     }
