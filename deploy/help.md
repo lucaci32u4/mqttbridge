@@ -6,5 +6,5 @@ You should have passwordless ssh key already configured for your host, otherwise
 Rum the ansible script, editing your destination host:
 
 ```shell
-ansible-playbook deploy.yaml -i moonspawn.lr,
+ansible-playbook deploy.yaml -i moonspawn.lr, --extra-vars 'conffile=config.json progname=mqttbridge'
 ```

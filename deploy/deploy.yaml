@@ -27,24 +27,24 @@
     - name: Copy jar
       copy:
         src: "../target/{{jar}}"
-        dest: "/home/{{uz}}/.local/share/mqttbridge/"
+        dest: "/home/{{uz}}/.local/share/{{progname}}/"
         remote_src: false
 
     - name: Copy jar
       copy:
-        src: "config.json"
-        dest: "/home/{{uz}}/.config/mqttbridge/"
+        src: "{{conffile}}"
+        dest: "/home/{{uz}}/.config/{{progname}}/{{progname}}.json"
         remote_src: false
 
     - name: Copy systemd service
       template:
         src: "mqttbridge.service"
-        dest: "/home/{{uz}}/.config/systemd/user/"
+        dest: "/home/{{uz}}/.config/systemd/user/{{progname}}.service"
 
     - name: Stop existing mqttbridge
       systemd_service:
         scope: user
-        name: mqttbridge.service
+        name: "{{progname}}.service"
         state: stopped
       ignore_errors: True
 
@@ -56,7 +56,7 @@
     - name: Start mqttbridge
       systemd_service:
         scope: user
-        name: mqttbridge.service
+        name: "{{progname}}.service"
         state: started
         enabled: true
 
