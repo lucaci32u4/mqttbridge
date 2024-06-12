@@ -7,15 +7,15 @@ import lombok.extern.slf4j.Slf4j;
 import net.lucaciresearch.mqttbridge.device.DeviceCallInterface;
 import net.lucaciresearch.mqttbridge.device.DeviceChooseModule;
 import net.lucaciresearch.mqttbridge.device.DevicePropertiesInterface;
-import net.lucaciresearch.mqttbridge.util.Config;
 import net.lucaciresearch.mqttbridge.util.ConfigModule;
 import net.lucaciresearch.mqttbridge.util.JacksonModule;
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
+
 import org.apache.logging.log4j.core.config.Configurator;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
+import java.util.stream.Stream;
 
 @Slf4j
 @CommandLine.Command(name = "MqttBridge")
@@ -31,15 +31,16 @@ public class Main implements Callable<Integer> {
     @CommandLine.Option(names = { "--config" }, description = "Config file", required = true)
     String configfile;
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
 
         if (debug) {
             Configurator.setRootLevel(Level.DEBUG);
         }
 
-        ConfigModule<Object> module = new ConfigModule<Object>(configfile);
-        if (!module.initialize(true, new TypeReference<Config<Object>>() {
+        ConfigModule<Object> module = new ConfigModule<>(configfile);
+        if (!module.initialize(true, new TypeReference<>() {
         })) {
             return -1;
         }
@@ -63,6 +64,7 @@ public class Main implements Callable<Integer> {
             manager.setDevicePropertiesInterface((DevicePropertiesInterface) props);
             manager.setDci((DeviceCallInterface) deviceCallInterface);
             injector.injectMembers(manager);
+            deviceCallInterface.getNodes().stream().flatMap(n -> Stream.of(n.mqttAdapter(), n.deviceAdapter())).forEach(injector::injectMembers);
             manager.start();
         }
 
