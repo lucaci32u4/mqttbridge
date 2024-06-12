@@ -8,11 +8,13 @@ The application is compatible with Home Assistant dsicovery protocol over MQTT.
 
 # Supported devices: 
  * Marantz SR6010 over IP (will probabily work with any other model)
+ * Pipewire FilterChains (work in progress on `feat-pipewire` branch. Will be able to expose filter's parameters over MQTT)
 
 ## TODO:
 
+* Allow user to choose between json and yaml configuration
 * Diagram of adapters
-* How to define new devies
+* How to define new devices
 * Refactor modern Marantz AVR Support
 * Add Marantz RS232 old protocol support
 * Add Benq and Epson projector support over serial line
