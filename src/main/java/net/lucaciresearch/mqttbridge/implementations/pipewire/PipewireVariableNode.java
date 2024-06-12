@@ -19,10 +19,11 @@ import javax.naming.OperationNotSupportedException;
 import java.util.Map;
 
 public class PipewireVariableNode extends VariableNode<Map<String, Float>, Map<String, Float>> {
-    public PipewireVariableNode(PollSpeed pollSpeed, String deviceKey) {
-        super(pollSpeed, new PipewireDeviceAdapter(), deviceKey, new PipewireMqttAdapter(), deviceKey);
-    }
 
+
+    public PipewireVariableNode(PollSpeed pollSpeed, String deviceKey, Map<String, Float> min, Map<String, Float> max) {
+        super(pollSpeed, new PipewireDeviceAdapter(), deviceKey, new PipewireMqttAdapter(min, max), deviceKey);
+    }
 
     public static class PipewireDeviceAdapter implements DeviceAdapter<Map<String, Float>, Map<String, Float>> {
         @Override
@@ -39,6 +40,14 @@ public class PipewireVariableNode extends VariableNode<Map<String, Float>, Map<S
     @Slf4j
     public static class PipewireMqttAdapter implements MqttAdapter<Map<String, Float>> {
 
+        private final Map<String, Float> min;
+        private final Map<String, Float> max;
+
+        public PipewireMqttAdapter(Map<String, Float> min, Map<String, Float> max) {
+            this.min = min;
+            this.max = max;
+        }
+
         @Inject
         private ObjectReader reader;
 
@@ -49,7 +58,16 @@ public class PipewireVariableNode extends VariableNode<Map<String, Float>, Map<S
         @Override
         public Map<String, Float> parseMqtt(String mqttValue) throws InvalidMqttInput {
             try {
-                return reader.readValue(mqttValue);
+                Map<String, Float> res = reader.readValue(mqttValue);
+                if (res.size() < min.size())
+                    throw new InvalidMqttInput("Missing filter properties");
+                for (String key : res.keySet()) {
+                    if (!min.containsKey(key) || !max.containsKey(key))
+                        throw new InvalidMqttInput("Filter property " + key + " does not exist");
+                    if (min.get(key) > res.get(key) || res.get(key) > max.get(key))
+                        throw new InvalidMqttInput("Filter property " + key + " is outside of bounds [" + min.get(key) + ", " + max.get(key) + "]");
+                }
+                return res;
             } catch (JsonProcessingException e) {
                 throw new InvalidMqttInput("Cannot deserialize input: " + e.getMessage());
             }
