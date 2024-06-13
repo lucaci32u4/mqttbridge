@@ -39,13 +39,21 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
     private boolean isOpen = false;
 
     private final List<VariableNode<?, Map<String, Float>>> variableNodes = new ArrayList<>();
-
-    private final List<PipewireConfig.FilterChain> nodeDescriptionWhitelist = List.of(new PipewireConfig.FilterChain("Livingroom Eqializer", "liveq", List.of("eq-sd", "eq-lr", "eq-fc")));
-
     private final Map<PipewireConfig.FilterChain, Integer> pipewireIdCache = new HashMap<>();
+
+    private final List<PipewireConfig.FilterChain> nodeDescriptionWhitelist;
+
+    public PipewireShellInterface(List<PipewireConfig.FilterChain> nodeDescriptionWhitelist) {
+        this.nodeDescriptionWhitelist = nodeDescriptionWhitelist;
+    }
 
     @Override
     public void initializeConnection() {
+        try {
+            discoverFilters();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         isOpen = true;
         isOpenObservable.onNext(true);
     }

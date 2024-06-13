@@ -15,9 +15,6 @@ import java.util.List;
 @Accessors(fluent = true, chain = true)
 public class PipewireConfig {
 
-    @NotNull @Size(min = 1, max = 200)
-    String host;
-
     @NotNull
     private List<FilterChain> filterChains;
 
