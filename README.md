@@ -16,6 +16,10 @@ The application is compatible with Home Assistant discovery protocol over MQTT.
  * Marantz support over RS232 is not yet implemented
  * Pipewire support is still being worked on
 
+# Deploy
+
+See the deployment document [here](deploy/help.md)
+
 ## TODO:
 
 * Allow user to choose between json and yaml configuration
