@@ -1,10 +1,7 @@
 package net.lucaciresearch.mqttbridge.implementations.pipewire;
 
-import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Observable;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +12,7 @@ import net.lucaciresearch.mqttbridge.data.VariableNode;
 import net.lucaciresearch.mqttbridge.device.DeviceCallInterface;
 import net.lucaciresearch.mqttbridge.exceptions.CallFailException;
 import net.lucaciresearch.mqttbridge.exceptions.ConnectionFailedException;
+import net.lucaciresearch.mqttbridge.util.PollSpeed;
 import net.lucaciresearch.mqttbridge.util.Util;
 
 import java.io.ByteArrayOutputStream;
@@ -35,32 +33,71 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
 
     private static final Pattern propertyInfoScanner = Pattern.compile("Float\\s*([0-9.,]+)\\s*Float\\s*([0-9.,]+)\\s*Float\\s*([0-9.,]+)");
 
-    private final List<VariableNode<Map<String, Float>, Map<String, Float>>> variableNodes = new ArrayList<>();
+    private final PublishSubject<Boolean> isOpenObservable = PublishSubject.create();
 
-    private final List<PipewireConfig.FilterChain> nodeDescriptionWhitelist = List.of(new PipewireConfig.FilterChain("Livingroom Eqializer", List.of("eq-sd")));
+    private final PublishSubject<KeyValue<Map<String, Float>>> notificationObservable = PublishSubject.create();
+    private boolean isOpen = false;
 
+    private final List<VariableNode<?, Map<String, Float>>> variableNodes = new ArrayList<>();
 
+    private final List<PipewireConfig.FilterChain> nodeDescriptionWhitelist = List.of(new PipewireConfig.FilterChain("Livingroom Eqializer", "liveq", List.of("eq-sd", "eq-lr", "eq-fc")));
 
     private final Map<PipewireConfig.FilterChain, Integer> pipewireIdCache = new HashMap<>();
 
     @Override
     public void initializeConnection() {
-
+        isOpen = true;
+        isOpenObservable.onNext(true);
     }
 
     @Override
     public List<VariableNode<?, Map<String, Float>>> getNodes() {
-        return null;
+        return variableNodes;
     }
 
     @Override
     public boolean isOpen() {
-        return false;
+        return isOpen;
     }
 
     @Override
     public Map<String, Float> readValue(String deviceKey, boolean fastFail) throws ConnectionFailedException, CallFailException {
-        return null;
+        PipewireVariableNode variable = variableNodes.stream().filter(n -> n.deviceKey().equals(deviceKey)).map(PipewireVariableNode.class::cast).findAny().orElse(null);
+        if (variable == null)
+            throw new CallFailException("Variable " + deviceKey + "does not exist");
+
+        PipewireConfig.FilterChain filterChain = nodeDescriptionWhitelist.stream().filter(fc -> fc.subtopic.equals(variable.mqttSubtopic().split("/")[0])).findAny().orElse(null);
+        if (filterChain == null)
+            throw new CallFailException("Pipewire filter " + deviceKey + " not found in config");
+
+        Integer id = pipewireIdCache.get(filterChain);
+        if (id == null)
+            throw new CallFailException("Pipewire filter-chain " + filterChain.subtopic() + " not found in id cache");
+
+        try {
+            Map<String, Float> params = new HashMap<>();
+            String enumparams = executeCommand(List.of("pw-cli", "enum-params", id.toString(), "2"));
+            String[] parts = enumparams.split("type Spa:Pod:Object:Param:Props");
+            for (String part : parts) {
+                if (!part.contains("Prop: key Spa:Pod:Object:Param:Props:params")) {
+                    continue;
+                }
+                Matcher m = propertyScanner.matcher(part);
+                while (m.find()) {
+                    String filter = m.group(1);
+                    String parameter = m.group(2);
+                    Float value = Float.parseFloat(m.group(3));
+                    if (!filterChain.plugins().contains(filter)) {
+                        continue; // TODO: Here we can implement sending notifications to other filters that end up dumped together with this one
+                    }
+                    params.put(parameter, value);
+                }
+            }
+            return params;
+        } catch (IOException e) {
+            throw new CallFailException(e.getMessage());
+        }
+
     }
 
     @Override
@@ -70,21 +107,23 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
 
     @Override
     public Observable<Boolean> isOpenStream() {
-        return null;
+        return isOpenObservable;
     }
 
     @Override
     public Observable<KeyValue<Map<String, Float>>> notifyValue() {
-        return null;
+        return notificationObservable;
     }
 
     @Override
     public void closeConnection() {
-
+        isOpen = false;
+        isOpenObservable.onNext(false);
     }
 
 
     public void discoverFilters() throws IOException {
+
         String listing = executeCommand(List.of("pw-cli", "ls", "Node"));
         List<Integer> filters = Arrays.stream(listing.split("id\\s[0-9]+"))
                 .filter(section -> section.contains("PipeWire:Interface:Node"))
@@ -112,6 +151,8 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
 
             String enumparams = executeCommand(List.of("pw-cli", "enum-params", id.toString(), "2"));
             String infodump = executeCommand(List.of("pw-cli", "enum-params", id.toString(), "1"));
+            Map<String, Map<String, Float>> mins = new HashMap<>();
+            Map<String, Map<String, Float>> maxs = new HashMap<>();
             String[] parts = enumparams.split("type Spa:Pod:Object:Param:Props");
             for (String part : parts) {
                 if (!part.contains("Prop: key Spa:Pod:Object:Param:Props:params"))
@@ -119,6 +160,8 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
                 Matcher m = propertyScanner.matcher(part);
                 while (m.find()) {
                     String filter = m.group(1);
+                    if (!filterChain.plugins().contains(filter))
+                        continue;
                     String parameter = m.group(2);
                     int position = infodump.indexOf(filter + ":" + parameter);
                     if (position == -1)
@@ -129,13 +172,14 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
                         continue;
                     Float min = Float.parseFloat(minmax.group(2));
                     Float max = Float.parseFloat(minmax.group(3));
-
+                    mins.computeIfAbsent(filter, f -> new HashMap<>()).put(parameter, min);
+                    maxs.computeIfAbsent(filter, f -> new HashMap<>()).put(parameter, max);
                 }
             }
-
+            for (String filter : mins.keySet()) {
+                variableNodes.add(new PipewireVariableNode(PollSpeed.SLOW, filter, mins.get(filter), maxs.get(filter), filterChain.subtopic()));
+            }
             pipewireIdCache.put(filterChain, id);
-
-
         }
 
 
@@ -145,18 +189,17 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
         ProcessBuilder pb = new ProcessBuilder(pwcliArguments);
         try {
             Process process = pb.start();
-            boolean success = process.waitFor(5000, TimeUnit.MILLISECONDS);
+            InputStream stream = process.getInputStream();
+            ByteArrayOutputStream result = new ByteArrayOutputStream();
+            byte[] buffer = new byte[10240];
+            for (int length; (length = stream.read(buffer)) != -1; ) {
+                result.write(buffer, 0, length);
+            }
+            boolean success = process.waitFor(50000000, TimeUnit.MILLISECONDS);
             if (!success)
                 throw new IOException("Subprocess took too long to complete");
             if (process.exitValue() != 0)
                 throw new IOException("Subprocess exited with non-zero value " + process.exitValue());
-
-            InputStream stream = process.getInputStream();
-            ByteArrayOutputStream result = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            for (int length; (length = stream.read(buffer)) != -1; ) {
-                result.write(buffer, 0, length);
-            }
             return result.toString(StandardCharsets.UTF_8);
 
         } catch (InterruptedException e) {
@@ -165,9 +208,6 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
         }
 
     }
-
-
-
 
 }
 

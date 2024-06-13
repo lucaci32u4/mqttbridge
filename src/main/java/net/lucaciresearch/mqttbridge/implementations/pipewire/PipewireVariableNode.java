@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.inject.Inject;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.lucaciresearch.mqttbridge.data.DeviceAdapter;
 import net.lucaciresearch.mqttbridge.data.MqttAdapter;
@@ -21,8 +20,8 @@ import java.util.Map;
 public class PipewireVariableNode extends VariableNode<Map<String, Float>, Map<String, Float>> {
 
 
-    public PipewireVariableNode(PollSpeed pollSpeed, String deviceKey, Map<String, Float> min, Map<String, Float> max) {
-        super(pollSpeed, new PipewireDeviceAdapter(), deviceKey, new PipewireMqttAdapter(min, max), deviceKey);
+public PipewireVariableNode(PollSpeed pollSpeed, String filterName, Map<String, Float> min, Map<String, Float> max, String filterChain) {
+        super(pollSpeed, new PipewireDeviceAdapter(), filterChain + "/" + filterName, new PipewireMqttAdapter(min, max), filterChain + "/" + filterName);
     }
 
     public static class PipewireDeviceAdapter implements DeviceAdapter<Map<String, Float>, Map<String, Float>> {

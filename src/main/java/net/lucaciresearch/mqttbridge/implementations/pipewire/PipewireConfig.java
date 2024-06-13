@@ -30,6 +30,9 @@ public class PipewireConfig {
         @NotNull @Size(min = 1, max = 200)
         String description;
 
+        @NotNull @Size(min = 1, max = 200)
+        String subtopic;
+
         @NotEmpty
         List<String> plugins;
 
