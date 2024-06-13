@@ -222,7 +222,7 @@ public class BridgeManager<DTy> {
             }
         }
         List<String> unavailable = dci.getNodes().stream().filter(n -> n.availability() == Availability.UNAVAILABLE).map(VariableNode::deviceKey).toList();
-        log.info("Unavailable variables are: {}", String.join(" ", unavailable));
+        log.info("Unavailable variables are: {}", unavailable.isEmpty() ? "none" : String.join(" ", unavailable));
         log.info("Finished complete poll with {} available variables out of total {}", dci.getNodes().size() - unavailable.size(), dci.getNodes().size());
         isDoingDiscovery = false;
     }
@@ -262,7 +262,7 @@ public class BridgeManager<DTy> {
             Single<?> fut = mqttInterface.publishTopic(mqttInterface.getConfig().baseTopic() + "/" + varb.mqttSubtopic(), message, true)
                 .doOnError(throwable -> {
                 log.error("Failed to publish state to MQTT: {}", throwable.getMessage());
-            });;
+            });
             futures.add(fut);
         }
         Flowable<?> all = Single.merge(futures);
@@ -282,7 +282,6 @@ public class BridgeManager<DTy> {
         for (int i = 0; i < 3; i++) {
             Single<Mqtt5PublishResult> fut = mqttInterface.publishTopic(mqttInterface.getConfig().baseTopic() + "/" + variable.mqttSubtopic(), message, true);
             try {
-                long nano = System.nanoTime();
                 fut.timeout(6, TimeUnit.SECONDS).blockingGet();
                 exception = null;
                 break;
@@ -474,7 +473,7 @@ public class BridgeManager<DTy> {
     }
 
     private static String threadDump() {
-        StringBuffer threadDump = new StringBuffer(System.lineSeparator());
+        StringBuilder threadDump = new StringBuilder(System.lineSeparator());
         ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
         for(ThreadInfo threadInfo : threadMXBean.dumpAllThreads(false, false)) {
             threadDump.append(threadInfo.toString()).append("\n");

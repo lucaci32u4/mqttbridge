@@ -29,9 +29,9 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
 
     private static final Pattern objectIdScanner = Pattern.compile("object\\.serial\\s*=\\s*\"([0-9]+)\"");
 
-    private static final Pattern propertyScanner = Pattern.compile("String\\s*\"([-_\\w]+):([-_\\w]+)\"\\s*Float\\s*([0-9.,]+)");
+    private static final Pattern propertyScanner = Pattern.compile("String\\s*\"([-_\\w]+):([-_\\w]+)\"\\s*Float\\s*(-?[0-9.,]+)");
 
-    private static final Pattern propertyInfoScanner = Pattern.compile("Float\\s*([0-9.,]+)\\s*Float\\s*([0-9.,]+)\\s*Float\\s*([0-9.,]+)");
+    private static final Pattern propertyInfoScanner = Pattern.compile("Float\\s*(-?[0-9.,]+)\\s*Float\\s*(-?[0-9.,]+)\\s*Float\\s*(-?[0-9.,]+)");
 
     private final PublishSubject<Boolean> isOpenObservable = PublishSubject.create();
 
@@ -49,11 +49,6 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
 
     @Override
     public void initializeConnection() {
-        try {
-            discoverFilters();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         isOpen = true;
         isOpenObservable.onNext(true);
     }
@@ -110,7 +105,33 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
 
     @Override
     public Map<String, Float> writeValue(String deviceKey, Map<String, Float> deviceValue, boolean fastFail) throws ConnectionFailedException, CallFailException {
-        return null;
+        PipewireVariableNode variable = variableNodes.stream().filter(n -> n.deviceKey().equals(deviceKey)).map(PipewireVariableNode.class::cast).findAny().orElse(null);
+        if (variable == null)
+            throw new CallFailException("Variable " + deviceKey + "does not exist");
+
+        PipewireConfig.FilterChain filterChain = nodeDescriptionWhitelist.stream().filter(fc -> fc.subtopic.equals(variable.mqttSubtopic().split("/")[0])).findAny().orElse(null);
+        if (filterChain == null)
+            throw new CallFailException("Pipewire filter " + deviceKey + " not found in config");
+
+        Integer id = pipewireIdCache.get(filterChain);
+        if (id == null)
+            throw new CallFailException("Pipewire filter-chain " + filterChain.subtopic() + " not found in id cache");
+
+        String filter = variable.mqttSubtopic().split("/")[1];
+        StringBuilder sb = new StringBuilder();
+        sb.append("{ params = [ ");
+        for (String key : deviceValue.keySet()) {
+            sb.append("\"").append(filter).append("\"").append(" ").append(deviceValue.get(key)).append(" ");
+        }
+        sb.append("] }");
+
+        try {
+            String response = executeCommand(List.of("pw-cli", "set-param", id.toString(), "Props", sb.toString()));
+        } catch (IOException e) {
+            throw new CallFailException(e.getMessage());
+        }
+
+        return deviceValue;
     }
 
     @Override
@@ -203,7 +224,7 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
             for (int length; (length = stream.read(buffer)) != -1; ) {
                 result.write(buffer, 0, length);
             }
-            boolean success = process.waitFor(50000000, TimeUnit.MILLISECONDS);
+            boolean success = process.waitFor(5000, TimeUnit.MILLISECONDS);
             if (!success)
                 throw new IOException("Subprocess took too long to complete");
             if (process.exitValue() != 0)
