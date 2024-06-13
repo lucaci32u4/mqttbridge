@@ -121,7 +121,10 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
         StringBuilder sb = new StringBuilder();
         sb.append("{ params = [ ");
         for (String key : deviceValue.keySet()) {
-            sb.append("\"").append(filter).append("\"").append(" ").append(deviceValue.get(key)).append(" ");
+            String flt = deviceValue.get(key).toString();
+            if (!flt.contains("."))
+                flt = flt + ".0";
+            sb.append("\"").append(filter).append("\"").append(" ").append(flt).append(" ");
         }
         sb.append("] }");
 
