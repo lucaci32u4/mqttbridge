@@ -1,5 +1,8 @@
 config.json
+deploy/config-marantz.json
+deploy/config-pipewire.json
 deploy/config.json
+
 *.iml
 .idea
 target

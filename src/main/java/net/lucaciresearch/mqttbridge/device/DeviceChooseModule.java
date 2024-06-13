@@ -7,6 +7,8 @@ import jakarta.inject.Named;
 import lombok.extern.slf4j.Slf4j;
 import net.lucaciresearch.mqttbridge.implementations.marantzsr6010.MarantzTelnetConfig;
 import net.lucaciresearch.mqttbridge.implementations.marantzsr6010.SR6010DeviceImplementation;
+import net.lucaciresearch.mqttbridge.implementations.pipewire.PipewireConfig;
+import net.lucaciresearch.mqttbridge.implementations.pipewire.PipewireDeviceImplementation;
 import net.lucaciresearch.mqttbridge.util.Config;
 import net.lucaciresearch.mqttbridge.util.ConfigModule;
 
@@ -24,6 +26,13 @@ public class DeviceChooseModule extends AbstractModule {
                 return false;
             realConfigModule = config;
             devicePropertiesInterface = new SR6010DeviceImplementation(config.getDevice());
+        }
+        if (deviceCodename.equals("PipewireFilterChain")) {
+            ConfigModule<PipewireConfig> config = new ConfigModule<>(configFile);
+            if (!config.initialize(false, new TypeReference<Config<PipewireConfig>>() {}))
+                return false;
+            realConfigModule = config;
+            devicePropertiesInterface = new PipewireDeviceImplementation(config.getDevice());
         }
         if (realConfigModule == null || devicePropertiesInterface == null) {
             log.error("Device {} not known or failed to initialize device config", deviceCodename);

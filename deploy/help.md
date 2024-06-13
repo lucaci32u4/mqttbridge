@@ -6,5 +6,12 @@ You should have passwordless ssh key already configured for your host, otherwise
 Rum the ansible script, editing your destination host:
 
 ```shell
-ansible-playbook deploy.yaml -i moonspawn.lr, --extra-vars 'conffile=config.json progname=mqttbridge'
+ansible-playbook deploy.yaml -i moonspawn.lr, --extra-vars 'conffile=config-marantz.json progname=mqttbridge'
+```
+
+To deploy multiple instances on the same machine, use the `progname` parameter to install them as different systemd units:
+
+```shell
+ansible-playbook deploy.yaml -i moonspawn.lr, --extra-vars 'conffile=config-marantz.json progname=Marantz2Mqtt'
+ansible-playbook deploy.yaml -i moonspawn.lr, --extra-vars 'conffile=config-pipewire.json progname=Pipewire2Mqtt'
 ```
