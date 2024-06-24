@@ -450,6 +450,8 @@ public class BridgeManager<DTy> {
                 log.error("Variable declared itself as unavailable during polling");
                 node.infoState(InfoState.UNINITIALIZED);
                 node.availability(Availability.UNAVAILABLE);
+            } catch (Exception e) {
+                log.error("DEV ERROR: Caught unexpected error while polling", e);
             } finally {
                 node.lock().unlock();
             }
