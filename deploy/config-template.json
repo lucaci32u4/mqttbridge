@@ -15,5 +15,5 @@
   "device": {
     "host": "10.2.2.13"
   },
-  "deviceCodename": "SR6010"
+  "deviceCodename": "SR6010Telnet"
 }

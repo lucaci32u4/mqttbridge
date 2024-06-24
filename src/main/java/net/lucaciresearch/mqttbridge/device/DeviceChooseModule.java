@@ -20,7 +20,7 @@ public class DeviceChooseModule extends AbstractModule {
     private DevicePropertiesInterface<?, ?> devicePropertiesInterface;
 
     public boolean initialize(String deviceCodename, String configFile) {
-        if (deviceCodename.equals("SR6010")) {
+        if (deviceCodename.equals("SR6010Telnet")) {
             ConfigModule<MarantzTelnetConfig> config = new ConfigModule<>(configFile);
             if (!config.initialize(false, new TypeReference<Config<MarantzTelnetConfig>>() {}))
                 return false;

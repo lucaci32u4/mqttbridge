@@ -38,7 +38,7 @@ public class MarantzTelnetInterface implements DeviceCallInterface<String> {
 
     public MarantzTelnetInterface(MarantzTelnetConfig deviceConfig, List<VariableNode<?, String>> nodes) {
         this.nodes = nodes;
-        log.info("Telnet interface for SR6010 is not a real telnet protocol -- it's just a raw TCP socket");
+        log.info("Telnet interface is not a real telnet protocol -- it's just a raw TCP socket");
         connectionManager.creator(() -> {
             client = new Socket();
             try {

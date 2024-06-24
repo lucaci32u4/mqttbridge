@@ -234,4 +234,5 @@ public class SR6010DeviceImplementation implements DevicePropertiesInterface<Str
     public String getModel() {
         return "SR6010";
     }
+
 }
