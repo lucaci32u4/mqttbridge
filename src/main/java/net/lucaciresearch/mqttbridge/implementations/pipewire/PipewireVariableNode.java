@@ -1,6 +1,8 @@
 package net.lucaciresearch.mqttbridge.implementations.pipewire;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -48,7 +50,7 @@ public PipewireVariableNode(PollSpeed pollSpeed, String filterName, Map<String, 
         }
 
         @Inject
-        private ObjectReader reader;
+        private ObjectMapper mapper;
 
         @Inject
         private ObjectWriter writer;
@@ -57,7 +59,7 @@ public PipewireVariableNode(PollSpeed pollSpeed, String filterName, Map<String, 
         @Override
         public Map<String, Float> parseMqtt(String mqttValue) throws InvalidMqttInput {
             try {
-                Map<String, Float> res = reader.readValue(mqttValue);
+                Map<String, Float> res = mapper.readValue(mqttValue, new TypeReference<Map<String, Float>>() {});
                 if (res.size() < min.size())
                     throw new InvalidMqttInput("Missing filter properties");
                 for (String key : res.keySet()) {
