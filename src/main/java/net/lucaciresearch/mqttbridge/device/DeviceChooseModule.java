@@ -9,6 +9,7 @@ import net.lucaciresearch.mqttbridge.implementations.marantzsr6010.MarantzTelnet
 import net.lucaciresearch.mqttbridge.implementations.marantzsr6010.SR6010DeviceImplementation;
 import net.lucaciresearch.mqttbridge.implementations.pipewire.PipewireConfig;
 import net.lucaciresearch.mqttbridge.implementations.pipewire.PipewireDeviceImplementation;
+import net.lucaciresearch.mqttbridge.implementations.util.TcpConnectionHolder;
 import net.lucaciresearch.mqttbridge.util.Config;
 import net.lucaciresearch.mqttbridge.util.ConfigModule;
 
@@ -25,7 +26,9 @@ public class DeviceChooseModule extends AbstractModule {
             if (!config.initialize(false, new TypeReference<Config<MarantzTelnetConfig>>() {}))
                 return false;
             realConfigModule = config;
-            devicePropertiesInterface = new SR6010DeviceImplementation(config.getDevice());
+
+            // Here we instantiate the connection holder before anything else because only here we can distinguish between Telnet and Serial
+            devicePropertiesInterface = new SR6010DeviceImplementation(config.getDevice(), new TcpConnectionHolder(config.getDevice().host(), 23, 3000));
         }
         if (deviceCodename.equals("PipewireFilterChain")) {
             ConfigModule<PipewireConfig> config = new ConfigModule<>(configFile);

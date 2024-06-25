@@ -6,6 +6,7 @@ import net.lucaciresearch.mqttbridge.device.DeviceCallInterface;
 import net.lucaciresearch.mqttbridge.device.DevicePropertiesInterface;
 import net.lucaciresearch.mqttbridge.implementations.*;
 import net.lucaciresearch.mqttbridge.implementations.marantz.*;
+import net.lucaciresearch.mqttbridge.implementations.util.DuplexConnectionHolder;
 import net.lucaciresearch.mqttbridge.mqtt.HAClass;
 import net.lucaciresearch.mqttbridge.util.PollSpeed;
 
@@ -18,9 +19,11 @@ public class SR6010DeviceImplementation implements DevicePropertiesInterface<Str
 
     private final MarantzTelnetConfig deviceConfig;
 
+    private final DuplexConnectionHolder connectionHolder;
+
     @Override
     public List<DeviceCallInterface<String>> getCallInterface() {
-        return List.of(new MarantzTelnetInterface(deviceConfig, List.of(
+        return List.of(new MarantzDuplexInterface(connectionHolder, List.of(
                 new MarantzVariableNode<>(PollSpeed.VERY_SLOW, new OnOffAdapter(), "MU",
                         new BooleanHAMqttAdapter("Mute", HAClass.SWITCH),
                         "mute",  false, false, null),
