@@ -23,8 +23,21 @@ ansible-playbook deploy.yaml -i moonspawn.lr, --extra-vars 'conffile=config-pipe
 Running as a docker container is the easiest method to get up and running, but will not work with some devices that need access to OS resources (like PipewireFilterChain or RS232 projector's serial port).
 A workaround for RS232 is to pass the device in the container. 
 
-```text
-TODO: publish on ghcr.io
+Docker compose script:
+
+```docker-compose
+version: '3'
+
+services:
+  mqttbridge:
+    container_name: mqttbridge
+    image: ghcr.io/lucaci32u4/mqttbridge:latest
+    volumes: 
+      - ./config.json:/config/config.json
+      # Uncomment this if you're connecting to your device using a serial port and replace with your serial port path
+      # Use /dev/mqttbridge_serial as the port in the config file
+      # - /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A10MMGWJ-if00-port0:/dev/mqttbridge_serial
+    restart: unless-stopped
 ```
 
 ## Run manually (for development or testing)
