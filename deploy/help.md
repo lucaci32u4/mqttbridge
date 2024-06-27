@@ -1,6 +1,6 @@
 # Deploy
 
-## Use ansible to install as a systemd service
+## Use ansible to install as a systemd service on a remote host
 
 Copy the `config-template.json` to `config.json` and edit to match your configuration
 
