@@ -33,16 +33,16 @@ The `discovery` section contains details for exposing devices to Home Assistant 
 * `discoveryBaseTopic` must be the same topic Home Assistant is configured to listen on for discovery messages. The default is `homeassistant`
 
 For the `deviceCodename` field and device specific options, see the following documentation pages:
-* [Marantz](protocols/support/marantz.md)
-* [Epson Projector](protocols/support/epson-projector.md)
-* [Benq Projector](protocols/support/benq-projector.md)
-* [Pipewire Filter Chain](protocols/support/pipewire-filter-chain.md)
+* [Marantz](../protocols/support/marantz.md)
+* [Epson Projector](../protocols/support/epson-projector.md)
+* [Benq Projector](../protocols/support/benq-projector.md)
+* [Pipewire Filter Chain](../protocols/support/pipewire-filter-chain.md)
 
 
 
 ## Use ansible to install as a systemd service on a remote host
 
-This ansible playbook will create a user-level systemd service on your remote host. You **must** have java (at least 17) installed to properly run the application:
+This ansible playbook will create a user-level systemd service on your remote host. You **must** have java (at least 17) installed on the remote host to properly run the application:
 ```text
 $ java --version
 openjdk 22 2024-03-19
