@@ -25,7 +25,7 @@ A workaround for RS232 is to pass the device in the container.
 
 Docker compose script:
 
-```docker-compose
+```yaml
 version: '3'
 
 services:
