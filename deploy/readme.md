@@ -1,8 +1,57 @@
 # Deploy
 
+## Create a configuration file
+
+The config file is a json document with the following structure:
+
+```json
+{
+  "mqtt": {
+    "username": "yourMqttUsername",
+    "password": "yourMqttPassword",
+    "port": 1883,
+    "qos": 2,
+    "host": "ip-or-hostname-of-mqtt-broker",
+    "publisherId": "SomeBridgeApplication",
+    "baseTopic": "base/topic"
+  },
+  "discovery": {
+    "entityName": "Home assistant device name",
+    "discoveryBaseTopic": "homeassistant"
+  },
+  "device": {
+    # device specific options
+  },
+  "deviceCodename": "insert-device-type"
+}
+```
+
+The `mqtt` section contains connection details for the MQTT broker.
+
+The `discovery` section contains details for exposing devices to Home Assistant using MQTT Discovery protocol. To disable Home Assistant discovery, set this object to `null`.
+* `entityName` controls the name display name of the entity. The entity id is obtained by lowercasing and replacing spaces with underscores.
+* `discoveryBaseTopic` must be the same topic Home Assistant is configured to listen on for discovery messages. The default is `homeassistant`
+
+For the `deviceCodename` field and device specific options, see the following documentation pages:
+* [Marantz](protocols/support/marantz.md)
+* [Epson Projector](protocols/support/epson-projector.md)
+* [Benq Projector](protocols/support/benq-projector.md)
+* [Pipewire Filter Chain](protocols/support/pipewire-filter-chain.md)
+
+
+
 ## Use ansible to install as a systemd service on a remote host
 
-Copy the `config-template.json` to `config.json` and edit to match your configuration
+This ansible playbook will create a user-level systemd service on your remote host. You **must** have java (at least 17) installed to properly run the application:
+```text
+$ java --version
+openjdk 22 2024-03-19
+OpenJDK Runtime Environment (build 22)
+OpenJDK 64-Bit Server VM (build 22, mixed mode, sharing)
+```
+The jar will be placed in `~/.local/share/{{progname}}/{{jar}}`  
+The configuration file will be placed at `~/.config/{{progname}}/config.json`
+Use the `conffile` variable to pass the local path to the configuration file.
 
 You should have passwordless ssh key already configured for your host, otherwise look into ansible documentation on how to configure inventories.
 Run the ansible script, editing your destination host:
