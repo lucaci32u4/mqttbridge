@@ -14,15 +14,24 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import picocli.CommandLine;
 
+import java.io.IOException;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
 @Slf4j
-@CommandLine.Command(name = "MqttBridge")
+@CommandLine.Command(mixinStandardHelpOptions = true)
 public class Main implements Callable<Integer> {
 
-    public static void main(String[] args) {
-        new CommandLine(new Main()).execute(args);
+    public static void main(String[] args) throws IOException {
+        Properties vsn = new Properties();
+        vsn.load(Main.class.getClassLoader().getResourceAsStream("version.properties"));
+        Main main = new Main();
+        CommandLine.Model.CommandSpec commandSpec = CommandLine.Model.CommandSpec.forAnnotatedObject(main);
+        commandSpec.name(vsn.getProperty("app.name"));
+        commandSpec.version(vsn.getProperty("app.version"));
+        CommandLine commandLine = new CommandLine(commandSpec);
+        commandLine.execute(args);
     }
 
     @CommandLine.Option(names = { "--debug" }, description = "Print debug logging")
