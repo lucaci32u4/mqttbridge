@@ -1,0 +1,1 @@
+Support for controlling EPSON projectors over RS232 line is upcoming

@@ -16,7 +16,38 @@ The application is compatible with Home Assistant discovery protocol over MQTT.
  * Marantz support over RS232 is not yet implemented
  * Pipewire support is still being worked on
 
-# Deploy
+# Configuration and deployment
+
+The config file is a json document with the following structure:
+
+```json
+{
+  "mqtt": {
+    "username": "yourMqttUsername",
+    "password": "yourMqttPassword",
+    "port": 1883,
+    "qos": 2,
+    "host": "ip-of-mqtt-broker",
+    "publisherId": "SomeBridgeApplication",
+    "baseTopic": "base/topic"
+  },
+  "discovery": {
+    "entityName": "Home assistant device name",
+    "discoveryBaseTopic": "homeassistant"
+  },
+  "device": {
+    # device specific options
+  },
+  "deviceCodename": "insert-device-type"
+}
+```
+
+For the `deviceCodename` field and device specific options, see the following documentation pages:
+ * [Marantz](protocols/support/marantz.md)
+ * [Epson Projector](protocols/support/epson-projector.md)
+ * [Benq Projector](protocols/support/benq-projector.md)
+ * [Pipewire Filter Chain](protocols/support/pipewire-filter-chain.md)
+
 
 See the deployment document [here](deploy/readme.md)
 

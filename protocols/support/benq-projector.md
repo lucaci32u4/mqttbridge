@@ -1,0 +1,1 @@
+Support for controlling BENQ projectors over RS232 line is upcoming
