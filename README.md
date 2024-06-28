@@ -18,7 +18,7 @@ The application is compatible with Home Assistant discovery protocol over MQTT.
 
 # Deploy
 
-See the deployment document [here](deploy/help.md)
+See the deployment document [here](deploy/readme.md)
 
 ## TODO:
 
