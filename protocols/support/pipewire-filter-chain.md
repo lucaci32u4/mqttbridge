@@ -9,7 +9,7 @@
 This device type supports exposing a filter chain's `Float` parameters over MQTT. Communication with pipewire is implemented using shell commands, therefore **this device type is only compatible when installed directly on the host with pipewire, not in a docker container**.  
 Required dependencies: Pipewire's `pw-cli` command line tool. 
 
-## Device specific options
+## Configuration
 
 The configuration file contains a list of filter-chains whose individual plugins will be exposed each on their sub-topic.
 A exact copy of the description field must be given to find the right filter chain inside pipewire.
