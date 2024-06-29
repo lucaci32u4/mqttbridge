@@ -113,8 +113,8 @@ public class SR6010DeviceImplementation implements DevicePropertiesInterface<Str
                         "dialog-enhancer", true, true, null),
 
                 new MarantzVariableNode<>(PollSpeed.ALMOST_NEVER, new ChannelVolumeHalvesMarantzAdapter(), "PSDIL",
-                        new IntervalNumberSteppingHAMqttAdapter("Dialog Enhancer", HAClass.NUMBER, -12, +12, 0.5, "dB"),
-                        "dialog-enhancer", true, true, null)
+                        new IntervalNumberSteppingHAMqttAdapter("Dialog Enhancer Level", HAClass.NUMBER, -12, +12, 0.5, "dB"),
+                        "dialog-enhancer-level", true, true, null)
 
 
 
