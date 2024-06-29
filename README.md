@@ -1,5 +1,9 @@
 # MqttBridge
+[![License](https://img.shields.io/badge/License-AGPL-blue)](#license)
+[![Issues](https://img.shields.io/github/issues/lucaci32u4/mqttbridge)](https://github.com/lucaci32u4/mqttbridge/issues)
+[![GitHub tag](https://img.shields.io/github/tag/lucaci32u4/mqttbridge?include_prereleases=&sort=semver)](https://github.com/MichaelCurrin/lucaci32u4/releases/)
 ![build](https://github.com/lucaci32u4/mqttbridge/actions/workflows/maven.yml/badge.svg)
+
 
 
 MqttBridge is an application for connecting various smart devices to MQTT. It offers support base for exposing device's data to mqtt and syncing logic. 
