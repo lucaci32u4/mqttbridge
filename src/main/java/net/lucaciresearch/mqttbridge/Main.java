@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 public class Main implements Callable<Integer> {
 
     public static void main(String[] args) throws IOException {
+        System.setProperty("io.netty.tryReflectionSetAccessible", "false");
         Properties vsn = new Properties();
         vsn.load(Main.class.getClassLoader().getResourceAsStream("version.properties"));
         Main main = new Main();

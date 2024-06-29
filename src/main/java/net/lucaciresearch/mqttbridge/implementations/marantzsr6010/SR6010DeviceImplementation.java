@@ -1,6 +1,6 @@
 package net.lucaciresearch.mqttbridge.implementations.marantzsr6010;
 
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
 import net.lucaciresearch.mqttbridge.device.DeviceCallInterface;
 import net.lucaciresearch.mqttbridge.device.DevicePropertiesInterface;
@@ -14,16 +14,28 @@ import java.util.List;
 import java.util.Map;
 
 @Getter
-@AllArgsConstructor
 public class SR6010DeviceImplementation implements DevicePropertiesInterface<String, MarantzTelnetConfig> {
 
-    private final MarantzTelnetConfig deviceConfig;
+    // SR or NR
+    private final String series;
+
+    // 4-digit code: 6010, 5011, 5004 etc
+    private final String deviceCode;
 
     private final DuplexConnectionHolder connectionHolder;
 
-    @Override
-    public List<DeviceCallInterface<String>> getCallInterface() {
-        return List.of(new MarantzDuplexInterface(connectionHolder, List.of(
+    private final MarantzDuplexInterface marantzDuplexInterface;
+
+    public SR6010DeviceImplementation(DuplexConnectionHolder connectionHolder, String deviceCode, String series) throws IllegalArgumentException {
+        this.connectionHolder = connectionHolder;
+        this.deviceCode = deviceCode;
+        this.series = series;
+
+        // for now only SR6010 is supported
+        if (!series.equals("SR") || !deviceCode.equals("6010"))
+            throw new IllegalArgumentException("Device not supported");
+
+        marantzDuplexInterface = new MarantzDuplexInterface(connectionHolder, List.of(
                 new MarantzVariableNode<>(PollSpeed.VERY_SLOW, new OnOffAdapter(), "MU",
                         new BooleanHAMqttAdapter("Mute", HAClass.SWITCH),
                         "mute",  false, false, null),
@@ -225,7 +237,12 @@ public class SR6010DeviceImplementation implements DevicePropertiesInterface<Str
 //                                Map.entry("MULTI CH IN", "Multichannel")
 //                        )),
 //                        "surround-mode", false, false, null)
-        )));
+        ));
+    }
+
+    @Override
+    public List<DeviceCallInterface<String>> getCallInterface() {
+        return List.of(marantzDuplexInterface);
     }
 
     @Override
@@ -235,7 +252,7 @@ public class SR6010DeviceImplementation implements DevicePropertiesInterface<Str
 
     @Override
     public String getModel() {
-        return "SR6010";
+        return series + deviceCode;
     }
 
 }

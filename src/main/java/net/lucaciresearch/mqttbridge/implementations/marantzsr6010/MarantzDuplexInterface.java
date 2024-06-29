@@ -32,13 +32,13 @@ public class MarantzDuplexInterface implements DeviceCallInterface<String> {
 
     private volatile String responseResult = null;
 
-    private DuplexConnectionHolder connectionHolder;
+    private final DuplexConnectionHolder connectionHolder;
     private Thread readerThread;
 
     public MarantzDuplexInterface(DuplexConnectionHolder connectionHolder, List<VariableNode<?, String>> nodes) {
         this.nodes = nodes;
         this.connectionHolder = connectionHolder;
-        log.info("Telnet interface is not a real telnet protocol -- it's just a raw TCP socket");
+        log.info("Marantz Telnet interface is not a real telnet protocol -- it's just a raw TCP socket");
         connectionManager.creator(() -> {
             try {
                 connectionHolder.openConnection();
@@ -71,7 +71,7 @@ public class MarantzDuplexInterface implements DeviceCallInterface<String> {
 
                     }
                 } catch (IOException e) {
-                    return;
+                    // nothing
                 }
             });
             readerThread.start();
