@@ -6,7 +6,7 @@
 
     <groupId>net.lucaciresearch</groupId>
     <artifactId>mqttbridge</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.3.0</version>
     <description>Library for building bridges between MQTT and other external systems</description>
 
     <properties>
