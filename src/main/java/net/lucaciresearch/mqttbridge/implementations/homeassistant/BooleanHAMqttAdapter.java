@@ -1,4 +1,4 @@
-package net.lucaciresearch.mqttbridge.implementations;
+package net.lucaciresearch.mqttbridge.implementations.homeassistant;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.lucaciresearch.mqttbridge.data.AbstractHACompatibleMqttAdapter;

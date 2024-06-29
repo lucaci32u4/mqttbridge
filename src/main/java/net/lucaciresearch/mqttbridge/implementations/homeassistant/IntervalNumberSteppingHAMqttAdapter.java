@@ -1,12 +1,10 @@
-package net.lucaciresearch.mqttbridge.implementations;
+package net.lucaciresearch.mqttbridge.implementations.homeassistant;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.lucaciresearch.mqttbridge.data.AbstractHACompatibleMqttAdapter;
 import net.lucaciresearch.mqttbridge.exceptions.InvalidMqttInput;
 import net.lucaciresearch.mqttbridge.mqtt.HAClass;
 
-import javax.management.ObjectName;
 import javax.naming.OperationNotSupportedException;
 
 public class IntervalNumberSteppingHAMqttAdapter extends AbstractHACompatibleMqttAdapter<Double> {
