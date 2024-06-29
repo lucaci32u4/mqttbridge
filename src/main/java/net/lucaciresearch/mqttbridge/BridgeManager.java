@@ -42,6 +42,9 @@ public class BridgeManager<DTy> {
     private DiscoveryConfig discoveryConfig;
 
     @Inject
+    private Config<?> masterConfig;
+
+    @Inject
     private ObjectMapper mapper;
 
     @Setter
@@ -63,6 +66,12 @@ public class BridgeManager<DTy> {
     }
 
     public void start() {
+
+        // Fix guice not being able to inject null fields
+        if (masterConfig.discovery() == null) {
+            discoveryConfig = null;
+        }
+
         dci.getNodes().forEach(n -> n.infoState(InfoState.UNINITIALIZED));
         dci.getNodes().forEach(n -> n.availability(Availability.UNAVAILABLE));
 
@@ -319,6 +328,9 @@ public class BridgeManager<DTy> {
 
 
     private void publishDiscovery() throws AsyncRuntimeException, ConnectionFailedException {
+        if (discoveryConfig == null)
+            return;
+
         String deviceShort = discoveryConfig.entityName().toLowerCase().replace(" ", "_");
         for (VariableNode<?, DTy> variable : dci.getNodes()) {
             try {

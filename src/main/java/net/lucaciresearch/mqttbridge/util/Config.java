@@ -18,7 +18,7 @@ public class Config<DCTy> {
     @NotNull @Valid
     private MqttConfig mqtt;
 
-    @NotNull @Valid
+    @Valid
     private DiscoveryConfig discovery;
 
     @NotNull @Valid
