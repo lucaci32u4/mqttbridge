@@ -31,8 +31,7 @@ See the deployment document [here](deploy/readme.md)
 * Surround mode parameters on Marantz AVR's
 * Diagram of adapters
 * How to define new devices
-* Refactor modern Marantz AVR Support
-* Add Marantz RS232 old protocol support
+* Add Marantz old protocol support
 * Add Benq and Epson projector support over serial line
 * Github pages docs
 
