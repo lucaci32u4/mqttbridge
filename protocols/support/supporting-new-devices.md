@@ -21,3 +21,5 @@ We need to implement the following classes:
 * `VariableNode` is an abstract class that holds the current value of the variable being synced. It also contains the field `deviceKey` that used to identity the variable being queried in `DeviceCallInterface`. Usually, there is no need other than extend (and parametrize Ty) the class and provide an all-argument constructor. It can also hold be extended with extra flags and arguments that `DeviceCallInterface` might need to properly interface the device.
 * `DeviceAdapter` converts back and forth between variable value type (`Ty`) and read/write call content (`DTy`)
 * `MqttAdapter` converts back and forth between variable value type (`Ty`) and MQTT values (`String`). This class also handles augmenting Home Assistant Discovery with variable-specific properties. There are a few implementations available for most-used data types.
+
+Finally, we will have to make our new device available by adding it to `DeviceChooseModule` in the `initialize` section.
