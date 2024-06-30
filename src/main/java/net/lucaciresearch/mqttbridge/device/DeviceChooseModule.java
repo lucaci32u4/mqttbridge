@@ -7,7 +7,7 @@ import jakarta.inject.Named;
 import lombok.extern.slf4j.Slf4j;
 import net.lucaciresearch.mqttbridge.implementations.marantzsr6010.MarantzSerialConfig;
 import net.lucaciresearch.mqttbridge.implementations.marantzsr6010.MarantzTelnetConfig;
-import net.lucaciresearch.mqttbridge.implementations.marantzsr6010.SR6010DeviceImplementation;
+import net.lucaciresearch.mqttbridge.implementations.marantzsr6010.MarantzDeviceImplementation;
 import net.lucaciresearch.mqttbridge.implementations.pipewire.PipewireConfig;
 import net.lucaciresearch.mqttbridge.implementations.pipewire.PipewireDeviceImplementation;
 import net.lucaciresearch.mqttbridge.implementations.util.DuplexConnectionHolder;
@@ -78,7 +78,7 @@ public class DeviceChooseModule extends AbstractModule {
         } else return false;
 
         try {
-            devicePropertiesInterface = new SR6010DeviceImplementation(connectionHolder, code, series);
+            devicePropertiesInterface = new MarantzDeviceImplementation(connectionHolder, code, series);
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage());
             log.error("Device {}{} is not yet supported, but support is planned. To speed up development, please open an issue on Github to let us know of your interest in this device. Community contributions are always welcome.", series, code);

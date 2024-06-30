@@ -14,6 +14,8 @@ The application is compatible with Home Assistant discovery protocol over MQTT.
  * Marantz SR6010 over IP (will probabily work with any other model)
  * Pipewire FilterChains
 
+
+
 # Status
 
  * Marantz support over IP is working properly. Has been running stable for 2 weeks on my SR6010. Some issues with surround mode setting due to bad documentation on marantz's side. Will be fixed in the future. 

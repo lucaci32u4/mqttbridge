@@ -23,3 +23,14 @@ We need to implement the following classes:
 * `MqttAdapter` converts back and forth between variable value type (`Ty`) and MQTT values (`String`). This class also handles augmenting Home Assistant Discovery with variable-specific properties. There are a few implementations available for most-used data types.
 
 Finally, we will have to make our new device available by adding it to `DeviceChooseModule` in the `initialize` method.
+
+
+
+## Marantz devices
+
+Marantz devices have very bad documentation for the control protocol. There are some spreadsheets available on their website that specify what variables which device supports, but they are incomplete and probably outdated.  
+
+There are at least 2 versions of the control protocol, out of which we implement the new one found in [this spreadsheet](../Marantz%202014%20NR%20Series%20-%20SR%20Series%20RS232%20IP%20Protocol.xls).
+Support for the old protocol ([this other spreadsheep](../Marantz_RS232C_Command_List-Receiver_All.xls)) will be available in the near future. 
+
+The groundwork to implement marantz (and probably denon) devices is already done. We only need to modify the `MarantzDeviceImplementation` class to build the appropiate list of variables for each device type.
