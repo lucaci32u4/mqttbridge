@@ -418,6 +418,7 @@ public class BridgeManager<DTy> {
             e.printStackTrace();
         }
     }
+
     void initializePolling() {
         for (PollSpeed spd : PollSpeed.values()) {
             if (spd.getMilliseconds() > 0) {
