@@ -27,15 +27,6 @@ For adding support for other devices, see this document [here](protocols/support
 
 See the deployment document [here](deploy/readme.md)
 
-## TODO:
-
-* Allow user to choose between json and yaml configuration
-* Surround mode parameters on Marantz AVR's
-* Add example for supporting new devices
-* Add Marantz old protocol support
-* Add Benq and Epson projector support over serial line
-* Github pages docs
-
 
 ## License
 
