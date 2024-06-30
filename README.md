@@ -31,8 +31,7 @@ See the deployment document [here](deploy/readme.md)
 
 * Allow user to choose between json and yaml configuration
 * Surround mode parameters on Marantz AVR's
-* Diagram of adapters
-* How to define new devices
+* Add example for supporting new devices
 * Add Marantz old protocol support
 * Add Benq and Epson projector support over serial line
 * Github pages docs
