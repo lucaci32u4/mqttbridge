@@ -79,7 +79,7 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
 
         try {
             Map<String, Float> params = new HashMap<>();
-            String enumparams = executeCommand(List.of("pw-cli", "enum-params", id.toString(), "2"));
+            String enumparams = Util.executeCommand(List.of("pw-cli", "enum-params", id.toString(), "2"), 5000);
             String[] parts = enumparams.split("type Spa:Pod:Object:Param:Props");
             for (String part : parts) {
                 if (!part.contains("Prop: key Spa:Pod:Object:Param:Props:params")) {
@@ -129,7 +129,7 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
         sb.append("] }");
 
         try {
-            String response = executeCommand(List.of("pw-cli", "set-param", id.toString(), "Props", sb.toString()));
+            String response = Util.executeCommand(List.of("pw-cli", "set-param", id.toString(), "Props", sb.toString()), 5000);
         } catch (IOException e) {
             throw new CallFailException(e.getMessage());
         }
@@ -156,7 +156,7 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
 
     public void discoverFilters() throws IOException {
 
-        String listing = executeCommand(List.of("pw-cli", "ls", "Node"));
+        String listing = Util.executeCommand(List.of("pw-cli", "ls", "Node"), 5000);
         List<Integer> filters = Arrays.stream(listing.split("id\\s[0-9]+"))
                 .filter(section -> section.contains("PipeWire:Interface:Node"))
                 .filter(section -> section.contains("\"Audio/Sink\""))
@@ -181,8 +181,8 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
             if (filterChain == null)
                 continue;
 
-            String enumparams = executeCommand(List.of("pw-cli", "enum-params", id.toString(), "2"));
-            String infodump = executeCommand(List.of("pw-cli", "enum-params", id.toString(), "1"));
+            String enumparams = Util.executeCommand(List.of("pw-cli", "enum-params", id.toString(), "2"), 5000);
+            String infodump = Util.executeCommand(List.of("pw-cli", "enum-params", id.toString(), "1"), 5000);
             Map<String, Map<String, Float>> mins = new HashMap<>();
             Map<String, Map<String, Float>> maxs = new HashMap<>();
             String[] parts = enumparams.split("type Spa:Pod:Object:Param:Props");
@@ -214,30 +214,6 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
             pipewireIdCache.put(filterChain, id);
         }
 
-
-    }
-
-    private String executeCommand(List<String> pwcliArguments) throws IOException {
-        ProcessBuilder pb = new ProcessBuilder(pwcliArguments);
-        try {
-            Process process = pb.start();
-            InputStream stream = process.getInputStream();
-            ByteArrayOutputStream result = new ByteArrayOutputStream();
-            byte[] buffer = new byte[10240];
-            for (int length; (length = stream.read(buffer)) != -1; ) {
-                result.write(buffer, 0, length);
-            }
-            boolean success = process.waitFor(5000, TimeUnit.MILLISECONDS);
-            if (!success)
-                throw new IOException("Subprocess took too long to complete");
-            if (process.exitValue() != 0)
-                throw new IOException("Subprocess exited with non-zero value " + process.exitValue());
-            return result.toString(StandardCharsets.UTF_8);
-
-        } catch (InterruptedException e) {
-            log.error("Interrupted while waiting for subprocess");
-            throw new IOException("Interrupted");
-        }
 
     }
 
