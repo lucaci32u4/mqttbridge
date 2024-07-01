@@ -1,7 +1,6 @@
 package net.lucaciresearch.mqttbridge.device;
 
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.subjects.PublishSubject;
+
 import net.lucaciresearch.mqttbridge.data.VariableNode;
 import net.lucaciresearch.mqttbridge.util.ConnectionManager;
 
