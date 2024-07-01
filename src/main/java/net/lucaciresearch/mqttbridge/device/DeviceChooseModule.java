@@ -5,6 +5,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import jakarta.inject.Named;
 import lombok.extern.slf4j.Slf4j;
+import net.lucaciresearch.mqttbridge.implementations.demo.TimeDeviceProperties;
 import net.lucaciresearch.mqttbridge.implementations.marantzsr6010.MarantzSerialConfig;
 import net.lucaciresearch.mqttbridge.implementations.marantzsr6010.MarantzTelnetConfig;
 import net.lucaciresearch.mqttbridge.implementations.marantzsr6010.MarantzDeviceImplementation;
@@ -16,6 +17,7 @@ import net.lucaciresearch.mqttbridge.implementations.util.TcpConnectionHolder;
 import net.lucaciresearch.mqttbridge.util.Config;
 import net.lucaciresearch.mqttbridge.util.ConfigModule;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,6 +44,14 @@ public class DeviceChooseModule extends AbstractModule {
                 return false;
             realConfigModule = config;
             devicePropertiesInterface = new PipewireDeviceImplementation(config.getDevice());
+        }
+
+        if (deviceCodename.equals("LocalTime")) {
+            ConfigModule<Object> config = new ConfigModule<>(configFile);
+            if (!config.initialize(false, new TypeReference<Config<Object>>() {}))
+                return false;
+            realConfigModule = config;
+            devicePropertiesInterface = new TimeDeviceProperties();
         }
 
         // Default no device found
