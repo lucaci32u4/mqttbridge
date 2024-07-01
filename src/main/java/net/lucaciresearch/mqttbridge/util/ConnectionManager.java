@@ -26,9 +26,6 @@ public class ConnectionManager {
     @Getter @Setter
     private long incrementDelay = 500;
 
-    @Getter @Setter
-    private long maximumDelay = 8000;
-
     private DesiredState state = DesiredState.OFF;
 
     private SystemState systemState = SystemState.STOPPED;
