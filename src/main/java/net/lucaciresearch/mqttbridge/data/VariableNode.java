@@ -2,7 +2,6 @@ package net.lucaciresearch.mqttbridge.data;
 
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import net.lucaciresearch.mqttbridge.exceptions.InputIgnoredException;
@@ -13,8 +12,6 @@ import net.lucaciresearch.mqttbridge.util.PollSpeed;
 import net.lucaciresearch.mqttbridge.util.TruthSource;
 
 import java.util.Objects;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.ReentrantLock;
 
 
 @Accessors(fluent = true, chain = true)
