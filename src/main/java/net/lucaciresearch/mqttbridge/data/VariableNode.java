@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import net.lucaciresearch.mqttbridge.exceptions.InputIgnoredException;
 import net.lucaciresearch.mqttbridge.exceptions.InvalidMqttInput;
 import net.lucaciresearch.mqttbridge.exceptions.VariableUnavailableException;
 import net.lucaciresearch.mqttbridge.util.BetterReentrantLock;
@@ -101,6 +102,8 @@ public abstract class VariableNode<Ty, DTy> {
         try {
             Ty value = deviceAdapter.parseDevice(deviceValue);
             setValue(value, TruthSource.DEVICE);
+        } catch (InputIgnoredException e) {
+            // nothing
         } catch (Exception any) {
             log.error("Parsing device value {} for variable {} failed", deviceValue, deviceKey, any);
         }
