@@ -78,6 +78,7 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
             throw new CallFailException("Pipewire filter-chain " + filterChain.subtopic() + " not found in id cache");
 
         try {
+            String filter = variable.mqttSubtopic().split("/")[1];
             Map<String, Float> params = new HashMap<>();
             String enumparams = Util.executeCommand(List.of("pw-cli", "enum-params", id.toString(), "2"), 5000);
             String[] parts = enumparams.split("type Spa:Pod:Object:Param:Props");
@@ -87,12 +88,16 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
                 }
                 Matcher m = propertyScanner.matcher(part);
                 while (m.find()) {
-                    String filter = m.group(1);
+                    String readfilter = m.group(1);
                     String parameter = m.group(2);
                     Float value = Float.parseFloat(m.group(3));
-                    if (!filterChain.plugins().contains(filter)) {
+                    if (!filterChain.plugins().contains(readfilter)) {
+                        continue;
+                    }
+                    if (!readfilter.equals(filter)) {
                         continue; // TODO: Here we can implement sending notifications to other filters that end up dumped together with this one
                     }
+
                     params.put(parameter, value);
                 }
             }
@@ -119,19 +124,34 @@ public class PipewireShellInterface implements DeviceCallInterface<Map<String, F
 
         String filter = variable.mqttSubtopic().split("/")[1];
         StringBuilder sb = new StringBuilder();
-        sb.append("{ params = [ ");
+        int counter = 0;
+        int amount = 8;
         for (String key : deviceValue.keySet()) {
+            if (counter % amount == 0) {
+                sb.append("{ params = [ ");
+            }
             String flt = deviceValue.get(key).toString();
             if (!flt.contains("."))
                 flt = flt + ".0";
-            sb.append("\"").append(filter).append("\"").append(" ").append(flt).append(" ");
+            sb.append("\"").append(filter).append(":").append(key).append("\"").append(" ").append(flt).append(" ");
+            counter++;
+            if (counter % amount == 0) {
+                sb.append("] }");
+                try {
+                    String response = Util.executeCommand(List.of("pw-cli", "set-param", id.toString(), "Props", sb.toString()), 5000);
+                } catch (IOException e) {
+                    throw new CallFailException(e.getMessage());
+                }
+                sb.setLength(0);
+            }
         }
-        sb.append("] }");
-
-        try {
-            String response = Util.executeCommand(List.of("pw-cli", "set-param", id.toString(), "Props", sb.toString()), 5000);
-        } catch (IOException e) {
-            throw new CallFailException(e.getMessage());
+        if (counter % amount != 0) {
+            sb.append("] }");
+            try {
+                String response = Util.executeCommand(List.of("pw-cli", "set-param", id.toString(), "Props", sb.toString()), 5000);
+            } catch (IOException e) {
+                throw new CallFailException(e.getMessage());
+            }
         }
 
         return deviceValue;
