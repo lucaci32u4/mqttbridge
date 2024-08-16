@@ -130,7 +130,37 @@ public class MarantzDeviceImplementation implements DevicePropertiesInterface<St
                         new IntervalNumberDoubleSteppingHAMqttAdapter("Dialog Enhancer Level", HAClass.NUMBER, -12, +12, 0.5, "dB"),
                         "dialog-enhancer-level", true, true, null),
 
-
+                new MarantzVariableNode<>(PollSpeed.SLOW, new EnumStringMarantzAdapter(false), "PSMULTEQ:",
+                        new EnumHACompatibleMqttAdapter("Audissey MultiEQ", HAClass.SELECT, Map.ofEntries(
+                                Map.entry("AUDISSEY",  "Reference"),
+                                Map.entry("BYP.LR", "Bypass L/R"),
+                                Map.entry("FLAT", "Flat"),
+                                Map.entry("Off", "OFF")
+                        )),
+                        "multi-eq", false, true, null),
+                new MarantzVariableNode<>(PollSpeed.SLOW, new OnOffAdapter(), "PSDYNEQ",
+                        new BooleanHAMqttAdapter("Audissey DynamicEQ", HAClass.SWITCH),
+                        "dynamic-eq", true, true, null),
+                new MarantzVariableNode<>(PollSpeed.SLOW, new EnumStringMarantzAdapter(false), "PSREFLEV",
+                        new EnumHACompatibleMqttAdapter("Audissey DynamicEQ Offset", HAClass.SELECT, Map.ofEntries(
+                                Map.entry("0",  "0 dB"),
+                                Map.entry("5", "5 dB"),
+                                Map.entry("10", "10 dB"),
+                                Map.entry("15", "15 dB")
+                        )), "dynamic-eq-offset", true, true, null),
+                new MarantzVariableNode<>(PollSpeed.SLOW, new EnumStringMarantzAdapter(false), "PSDYNVOL",
+                        new EnumHACompatibleMqttAdapter("Audissey Dynamic Volume", HAClass.SELECT, Map.ofEntries(
+                                Map.entry("OFF",  "Off"),
+                                Map.entry("LIT", "Light"),
+                                Map.entry("MED", "Medium"),
+                                Map.entry("HEV", "Heavy")
+                        )), "dynamic-volume", true, true, null),
+                new MarantzVariableNode<>(PollSpeed.SLOW, new OnOffAdapter(), "PSLFC",
+                        new BooleanHAMqttAdapter("Audissey LFC", HAClass.SWITCH),
+                        "audissey-lfc", true, true, null),
+                new MarantzVariableNode<>(PollSpeed.SLOW, new NumberLevelMarantzAdapter(2), "PSCNTAMT",
+                        new IntervalNumberIntegerSteppingHAMqttAdapter("Audissey LFC Containment Level", HAClass.NUMBER, 7, 0, 1, null),
+                        "lfc-cntamt", true, true, null)
 
 //                new MarantzVariableNode<>(PollSpeed.ALMOST_NEVER, new EnumStringMarantzAdapter(false), "MS",
 //                        new EnumHACompatibleMqttAdapter("Surround Mode", HAClass.SELECT, Map.ofEntries(
