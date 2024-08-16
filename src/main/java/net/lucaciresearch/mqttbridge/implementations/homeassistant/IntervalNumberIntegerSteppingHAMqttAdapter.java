@@ -7,16 +7,16 @@ import net.lucaciresearch.mqttbridge.mqtt.HAClass;
 
 import javax.naming.OperationNotSupportedException;
 
-public class IntervalNumberSteppingHAMqttAdapter extends AbstractHACompatibleMqttAdapter<Double> {
+public class IntervalNumberIntegerSteppingHAMqttAdapter extends AbstractHACompatibleMqttAdapter<Integer> {
 
-    private final double max;
+    private final int max;
 
-    private final double min;
+    private final int min;
 
-    private final double step;
+    private final int step;
     private final String unitOfMeasurement;
 
-    public IntervalNumberSteppingHAMqttAdapter(String hANiceName, HAClass hAClass, double max, double min, double step, String unitOfMeasurement) {
+    public IntervalNumberIntegerSteppingHAMqttAdapter(String hANiceName, HAClass hAClass, int max, int min, int step, String unitOfMeasurement) {
         super(hANiceName, hAClass);
         this.max = max;
         this.min = min;
@@ -25,8 +25,8 @@ public class IntervalNumberSteppingHAMqttAdapter extends AbstractHACompatibleMqt
     }
 
     @Override
-    public Double parseMqtt(String mqttValue) throws InvalidMqttInput {
-        double dbl = Double.parseDouble(mqttValue);
+    public Integer parseMqtt(String mqttValue) throws InvalidMqttInput {
+        int dbl = Integer.parseInt(mqttValue);
         dbl = dbl + (dbl % step);
         if (max < dbl) dbl = max;
         if (min > dbl) dbl = min;
@@ -34,7 +34,7 @@ public class IntervalNumberSteppingHAMqttAdapter extends AbstractHACompatibleMqt
     }
 
     @Override
-    public String toMqtt(Double value) {
+    public String toMqtt(Integer value) {
         return value.toString();
     }
 
@@ -43,6 +43,7 @@ public class IntervalNumberSteppingHAMqttAdapter extends AbstractHACompatibleMqt
         root.put("min", min);
         root.put("max", max);
         root.put("step", step);
-        root.put("unit_of_measurement", unitOfMeasurement);
+        if (unitOfMeasurement != null)
+            root.put("unit_of_measurement", unitOfMeasurement);
     }
 }

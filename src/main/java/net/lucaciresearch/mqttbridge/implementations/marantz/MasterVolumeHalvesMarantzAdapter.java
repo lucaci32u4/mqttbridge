@@ -2,17 +2,22 @@ package net.lucaciresearch.mqttbridge.implementations.marantz;
 
 import lombok.extern.slf4j.Slf4j;
 import net.lucaciresearch.mqttbridge.data.DeviceAdapter;
+import net.lucaciresearch.mqttbridge.exceptions.InputIgnoredException;
 
 @Slf4j
 public class MasterVolumeHalvesMarantzAdapter implements DeviceAdapter<Double, String> {
 
     @Override
-    public Double parseDevice(String deviceValue) {
+    public Double parseDevice(String deviceValue) throws InputIgnoredException {
         while (deviceValue.length() < 3) {
             deviceValue += "0";
         }
 
-        return Integer.parseInt(deviceValue) * 0.1 - 80;
+        try {
+            return Integer.parseInt(deviceValue) * 0.1 - 80;
+        } catch (NumberFormatException nfe) {
+            throw new InputIgnoredException();
+        }
     }
 
     @Override

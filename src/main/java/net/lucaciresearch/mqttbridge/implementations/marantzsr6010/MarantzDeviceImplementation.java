@@ -6,7 +6,8 @@ import net.lucaciresearch.mqttbridge.device.DeviceCallInterface;
 import net.lucaciresearch.mqttbridge.device.DevicePropertiesInterface;
 import net.lucaciresearch.mqttbridge.implementations.homeassistant.BooleanHAMqttAdapter;
 import net.lucaciresearch.mqttbridge.implementations.homeassistant.EnumHACompatibleMqttAdapter;
-import net.lucaciresearch.mqttbridge.implementations.homeassistant.IntervalNumberSteppingHAMqttAdapter;
+import net.lucaciresearch.mqttbridge.implementations.homeassistant.IntervalNumberDoubleSteppingHAMqttAdapter;
+import net.lucaciresearch.mqttbridge.implementations.homeassistant.IntervalNumberIntegerSteppingHAMqttAdapter;
 import net.lucaciresearch.mqttbridge.implementations.marantz.*;
 import net.lucaciresearch.mqttbridge.implementations.util.DuplexConnectionHolder;
 import net.lucaciresearch.mqttbridge.mqtt.HAClass;
@@ -42,51 +43,51 @@ public class MarantzDeviceImplementation implements DevicePropertiesInterface<St
                         new BooleanHAMqttAdapter("Mute", HAClass.SWITCH),
                         "mute",  false, false, null),
                 new MarantzVariableNode<>(PollSpeed.VERY_SLOW, new MasterVolumeHalvesMarantzAdapter(), "MV",
-                        new IntervalNumberSteppingHAMqttAdapter("Volume", HAClass.NUMBER, +18, -80, 0.5, "dB"),
+                        new IntervalNumberDoubleSteppingHAMqttAdapter("Volume", HAClass.NUMBER, +18, -80, 0.5, "dB"),
                         "master-volume", false, false, null),
 
                 new MarantzVariableNode<>(PollSpeed.VERY_SLOW, new ChannelVolumeHalvesMarantzAdapter(), "CVC",
-                        new IntervalNumberSteppingHAMqttAdapter("Center Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
+                        new IntervalNumberDoubleSteppingHAMqttAdapter("Center Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
                         "center-volume", true, false, "CV", "CVEND"), // implement CVEND for this
                 new MarantzVariableNode<>(PollSpeed.VERY_SLOW, new ChannelVolumeHalvesMarantzAdapter(), "CVFL",
-                        new IntervalNumberSteppingHAMqttAdapter("Front-Left Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
+                        new IntervalNumberDoubleSteppingHAMqttAdapter("Front-Left Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
                         "front-left-volume", true, false, "CV", "CVEND"),
                 new MarantzVariableNode<>(PollSpeed.VERY_SLOW, new ChannelVolumeHalvesMarantzAdapter(), "CVFR",
-                        new IntervalNumberSteppingHAMqttAdapter("Front-Right Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
+                        new IntervalNumberDoubleSteppingHAMqttAdapter("Front-Right Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
                         "front-right-volume", true, false, "CV", "CVEND"),
 
                 new MarantzVariableNode<>(PollSpeed.VERY_SLOW, new ChannelVolumeHalvesMarantzAdapter(), "CVSL",
-                        new IntervalNumberSteppingHAMqttAdapter("Side-Left Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
+                        new IntervalNumberDoubleSteppingHAMqttAdapter("Side-Left Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
                         "side-left-volume", true, false, "CV", "CVEND"),
                 new MarantzVariableNode<>(PollSpeed.VERY_SLOW, new ChannelVolumeHalvesMarantzAdapter(), "CVSR",
-                        new IntervalNumberSteppingHAMqttAdapter("Side-Right Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
+                        new IntervalNumberDoubleSteppingHAMqttAdapter("Side-Right Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
                         "side-right-volume", true, false, "CV", "CVEND"),
 
                 new MarantzVariableNode<>(PollSpeed.VERY_SLOW, new ChannelVolumeHalvesMarantzAdapter(), "CVSBL",
-                        new IntervalNumberSteppingHAMqttAdapter("Back-Left Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
+                        new IntervalNumberDoubleSteppingHAMqttAdapter("Back-Left Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
                         "back-left-volume", true, false, "CV", "CVEND"),
                 new MarantzVariableNode<>(PollSpeed.VERY_SLOW, new ChannelVolumeHalvesMarantzAdapter(), "CVSBR",
-                        new IntervalNumberSteppingHAMqttAdapter("Back-Right Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
+                        new IntervalNumberDoubleSteppingHAMqttAdapter("Back-Right Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
                         "back-right-volume", true, false, "CV", "CVEND"),
 
                 new MarantzVariableNode<>(PollSpeed.VERY_SLOW, new ChannelVolumeHalvesMarantzAdapter(), "CVFHL",
-                        new IntervalNumberSteppingHAMqttAdapter("Front-Height-Left Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
+                        new IntervalNumberDoubleSteppingHAMqttAdapter("Front-Height-Left Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
                         "front-height-left-volume", true, false, "CV", "CVEND"),
                 new MarantzVariableNode<>(PollSpeed.VERY_SLOW, new ChannelVolumeHalvesMarantzAdapter(), "CVFHR",
-                        new IntervalNumberSteppingHAMqttAdapter("Front-Height-Right Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
+                        new IntervalNumberDoubleSteppingHAMqttAdapter("Front-Height-Right Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
                         "front-height-right-volume", true, false, "CV", "CVEND"),
                 new MarantzVariableNode<>(PollSpeed.VERY_SLOW, new ChannelVolumeHalvesMarantzAdapter(), "CVFWL",
-                        new IntervalNumberSteppingHAMqttAdapter("Front-Wide-Left Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
+                        new IntervalNumberDoubleSteppingHAMqttAdapter("Front-Wide-Left Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
                         "front-wide-left-volume", true, false, "CV", "CVEND"),
                 new MarantzVariableNode<>(PollSpeed.VERY_SLOW, new ChannelVolumeHalvesMarantzAdapter(), "CVFWR",
-                        new IntervalNumberSteppingHAMqttAdapter("Front-Wide-Right Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
+                        new IntervalNumberDoubleSteppingHAMqttAdapter("Front-Wide-Right Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
                         "front-wide-right-volume", true, false, "CV", "CVEND"),
 
                 new MarantzVariableNode<>(PollSpeed.VERY_SLOW, new ChannelVolumeHalvesMarantzAdapter(), "CVSW",
-                        new IntervalNumberSteppingHAMqttAdapter("Subwoofer 1 Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
+                        new IntervalNumberDoubleSteppingHAMqttAdapter("Subwoofer 1 Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
                         "subwoofer-1-volume", true, false, "CV", "CVEND"),
                 new MarantzVariableNode<>(PollSpeed.VERY_SLOW, new ChannelVolumeHalvesMarantzAdapter(), "CVSW2",
-                        new IntervalNumberSteppingHAMqttAdapter("Subwoofer 2 Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
+                        new IntervalNumberDoubleSteppingHAMqttAdapter("Subwoofer 2 Channel", HAClass.NUMBER, +12, -12, 0.5, "dB"),
                         "subwoofer-2-volume", true, false, "CV", "CVEND"),
 
                 new MarantzVariableNode<>(PollSpeed.ALMOST_NEVER, new EnumStringMarantzAdapter(false), "DIM",
@@ -125,10 +126,9 @@ public class MarantzDeviceImplementation implements DevicePropertiesInterface<St
                                 Map.entry("HIGH", "High")
                         )),
                         "dialog-enhancer", true, true, null),
-
                 new MarantzVariableNode<>(PollSpeed.ALMOST_NEVER, new ChannelVolumeHalvesMarantzAdapter(), "PSDIL",
-                        new IntervalNumberSteppingHAMqttAdapter("Dialog Enhancer Level", HAClass.NUMBER, -12, +12, 0.5, "dB"),
-                        "dialog-enhancer-level", true, true, null)
+                        new IntervalNumberDoubleSteppingHAMqttAdapter("Dialog Enhancer Level", HAClass.NUMBER, -12, +12, 0.5, "dB"),
+                        "dialog-enhancer-level", true, true, null),
 
 
 
