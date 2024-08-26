@@ -29,6 +29,7 @@ public class ConfigModule<DCTy> extends AbstractModule {
     private final String configPath;
     private MqttConfig mqttConfig;
     private DCTy deviceConfig;
+    private Config<DCTy> masterConfig;
     private String deviceCodename;
 
     public ConfigModule(String configPath) {
@@ -82,12 +83,18 @@ public class ConfigModule<DCTy> extends AbstractModule {
         }
         mqttConfig = config.mqtt();
         deviceConfig = config.device();
+        masterConfig = config;
         return true;
     }
 
     @Provides
     public MqttConfig getMqtt() {
         return mqttConfig;
+    }
+
+    @Provides
+    public Config getConfig() {
+        return masterConfig;
     }
 
     public DCTy getDevice() {

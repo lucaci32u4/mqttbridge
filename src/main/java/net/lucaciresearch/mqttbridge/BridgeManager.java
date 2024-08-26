@@ -42,7 +42,7 @@ public class BridgeManager<DTy> {
     private DiscoveryConfig discoveryConfig;
 
     @Inject
-    private Config<?> masterConfig;
+    private Config masterConfig;
 
     @Inject
     private ObjectMapper mapper;
