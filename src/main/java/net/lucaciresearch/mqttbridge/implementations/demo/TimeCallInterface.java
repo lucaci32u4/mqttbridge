@@ -37,7 +37,7 @@ public class TimeCallInterface extends AbstractConnectionlessDeviceCallInterface
     public String readValue(String deviceKey, boolean fastFail) throws ConnectionFailedException, CallFailException {
         LinuxTimeVariableNode variable = getNodes().stream().filter(dk -> dk.deviceKey().equals(deviceKey)).map(LinuxTimeVariableNode.class::cast).findFirst().orElse(null);
         try {
-            return Util.executeCommand(List.of("bash", "-c", variable.getGetFormat()), 1000);
+            return Util.executeCommand(List.of("bash", "-c", variable.getGetFormat()), 1000).replace("\n", "");
         } catch (IOException e) {
             throw new ConnectionFailedException(e.getMessage());
         }
@@ -47,7 +47,7 @@ public class TimeCallInterface extends AbstractConnectionlessDeviceCallInterface
     public String writeValue(String deviceKey, String deviceValue, boolean fastFail) throws ConnectionFailedException, CallFailException {
         LinuxTimeVariableNode variable = getNodes().stream().filter(dk -> dk.deviceKey().equals(deviceKey)).map(LinuxTimeVariableNode.class::cast).findFirst().orElse(null);
         try {
-            return Util.executeCommand(List.of("bash", "-c", variable.getSetFormat().replace("{}", deviceValue)), 1000);
+            return Util.executeCommand(List.of("bash", "-c", variable.getSetFormat().replace("{}", deviceValue)), 1000).replace("\n", "");
         } catch (IOException e) {
             throw new ConnectionFailedException(e.getMessage());
         }

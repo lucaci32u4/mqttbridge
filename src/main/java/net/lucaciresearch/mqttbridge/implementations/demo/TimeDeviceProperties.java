@@ -17,7 +17,7 @@ public class TimeDeviceProperties implements DevicePropertiesInterface<String, O
             new LinuxTimeVariableNode<LocalTime>(PollSpeed.NONE, new TimeDeviceAdapter(), "currentTime", new LocalTimeMqttAdapter(), "current-time",
                     "date -s {} +'%H:%M:%S'", "date +'%H:%M:%S'"),
             new LinuxTimeVariableNode<LocalDate>(PollSpeed.NONE, new DateDeviceAdapter(), "currentDate", new LocalDateMqttAdapter(), "current-date",
-                    "date -s {} +'%d-%m-%Y'", "date +'%d-%m-%Y'")
+                    "date -s {} +'%Y-%m-%d'", "date +'%Y-%m-%d'")
         ));
     }
 
