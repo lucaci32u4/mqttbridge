@@ -46,7 +46,7 @@ public class DeviceChooseModule extends AbstractModule {
             devicePropertiesInterface = new PipewireDeviceImplementation(config.getDevice());
         }
 
-        if (deviceCodename.equals("LocalTime")) {
+        if (deviceCodename.equals("LinuxDateTime")) {
             ConfigModule<Object> config = new ConfigModule<>(configFile);
             if (!config.initialize(false, new TypeReference<Config<Object>>() {}))
                 return false;
