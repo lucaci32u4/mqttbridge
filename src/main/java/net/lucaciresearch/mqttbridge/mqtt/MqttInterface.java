@@ -62,7 +62,7 @@ public class MqttInterface {
                     .willPublish(Mqtt5Publish.builder()
                             .topic(config.baseTopic())
                             .qos(MqttQos.EXACTLY_ONCE)
-                            .payload("\"{ \"system\": false }\"".getBytes())
+                            .payload("{ \"system\": false }".getBytes())
                             .retain(true)
                             .build()
                     )
@@ -88,7 +88,7 @@ public class MqttInterface {
                 client.publish(Single.just(Mqtt5Publish.builder()
                         .topic(config.baseTopic())
                         .qos(MqttQos.EXACTLY_ONCE)
-                        .payload("\"{ \"system\": true }\"".getBytes())
+                        .payload("{ \"system\": true }".getBytes())
                         .retain(true)
                         .build()
                 ).toFlowable()).blockingSubscribe();
