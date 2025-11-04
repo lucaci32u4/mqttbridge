@@ -9,6 +9,9 @@ import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishResult;
 import com.hivemq.client.mqtt.mqtt5.message.publish.puback.Mqtt5PubAck;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import jakarta.inject.Inject;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +55,8 @@ public class BridgeManager<DTy> {
 
     @Setter
     private DeviceCallInterface<DTy> dci;
+
+    private Scheduler dciScheduler = Schedulers.from(Executors.newSingleThreadExecutor());
 
     private final int pollingRetryCount = 3;
 
@@ -169,7 +174,7 @@ public class BridgeManager<DTy> {
                     }
                 });
             });
-            vb.infoStateStream().subscribe(infoState -> {
+            vb.infoStateStream().subscribeOn(dciScheduler).subscribe(infoState -> {
 
                 if (!vb.availability().bool())
                     return;

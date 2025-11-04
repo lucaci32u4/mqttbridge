@@ -30,11 +30,21 @@
         dest: "/home/{{uz}}/.local/share/{{progname}}/"
         remote_src: false
 
+    - name: Create config folder
+      file:
+        state: directory
+        path: "/home/{{uz}}/.config/{{progname}}"
+
     - name: Copy config
       copy:
         src: "{{conffile}}"
         dest: "/home/{{uz}}/.config/{{progname}}/config.json"
         remote_src: false
+
+    - name: Create systemd service folder
+      file:
+        state: directory
+        path: "/home/{{uz}}/.config/systemd/user/"
 
     - name: Copy systemd service
       template:
