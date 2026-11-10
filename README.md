@@ -18,7 +18,7 @@ For adding support for other devices, see this document [here](protocols/support
 
 # Status
 
- * Marantz support over IP is working properly. Has been running stable for 2 weeks on my SR6010. Some issues with surround mode setting due to bad documentation on marantz's side. Will be fixed in the future. 
+ * Marantz support over IP is working properly. Has been running stable for years on my SR6010. Some issues with surround mode setting due to bad documentation on marantz's side. Will be fixed in the future. 
  * Marantz support over RS232 is not yet implemented
  * Pipewire support is still being worked on
 
