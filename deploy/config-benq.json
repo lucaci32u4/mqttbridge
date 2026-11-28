@@ -1,0 +1,20 @@
+{
+  "mqtt": {
+    "username": "admin",
+    "password": "admin",
+    "port": 7883,
+    "qos": 2,
+    "host": "hass.lr",
+    "publisherId": "BenqProjectorBridge",
+    "baseTopic": "benq2mqtt/livingroom"
+  },
+  "discovery": {
+    "entityName": "Projector",
+    "discoveryBaseTopic": "homeassistant"
+  },
+  "device": {
+    "port": "/dev/ttyUSB0",
+    "baud": 9600
+  },
+  "deviceCodename": "BenqW2700Serial"
+}
