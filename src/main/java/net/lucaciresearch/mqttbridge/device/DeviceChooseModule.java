@@ -5,6 +5,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import jakarta.inject.Named;
 import lombok.extern.slf4j.Slf4j;
+import net.lucaciresearch.mqttbridge.implementations.benq.BenqSerialConfig;
+import net.lucaciresearch.mqttbridge.implementations.benq.BenqW2700DeviceImplementation;
 import net.lucaciresearch.mqttbridge.implementations.demo.TimeDeviceProperties;
 import net.lucaciresearch.mqttbridge.implementations.marantzsr6010.MarantzSerialConfig;
 import net.lucaciresearch.mqttbridge.implementations.marantzsr6010.MarantzTelnetConfig;
@@ -36,6 +38,16 @@ public class DeviceChooseModule extends AbstractModule {
         // Marantz devices
         if (handleMarantzDevices(deviceCodename, configFile))
             return true;
+
+        // BenQ W2700 / HT3550 projector over RS-232 (same device, two market names)
+        if (deviceCodename.equals("BenqW2700Serial") || deviceCodename.equals("BenqHT3550Serial")) {
+            ConfigModule<BenqSerialConfig> config = new ConfigModule<>(configFile);
+            if (!config.initialize(false, new TypeReference<Config<BenqSerialConfig>>() {}))
+                return false;
+            realConfigModule = config;
+            devicePropertiesInterface = new BenqW2700DeviceImplementation(
+                    new SerialConnectionHolder(config.getDevice().port(), config.getDevice().baud()));
+        }
 
         // Pipewire Filter Chains
         if (deviceCodename.equals("PipewireFilterChain")) {
